@@ -282,7 +282,7 @@ class ProjectionUpdater extends EventHandler
         } else {
             $referenced_projection = $this->loadReferencedProjection($referenced_type, $referenced_identifier);
             if (!$referenced_projection) {
-                $this->logger->debug('[Zombie Alarm] Cant resolve referenced projection: '. $referenced_identifier);
+                $this->logger->debug('[Zombie Alarm] Unable to resolve referenced projection: ' . $referenced_identifier);
                 return $projection;
             }
         }
@@ -290,8 +290,32 @@ class ProjectionUpdater extends EventHandler
         $mirrored_values = [];
         foreach ($mirrored_attributes_map->getKeys() as $mirrored_attribute_name) {
             $mirrored_value = $referenced_projection->getValue($mirrored_attribute_name);
+            if ($mirrored_value instanceof EntityList) {
+                $mirrored_value_type_map = $mirrored_attributes_map[$mirrored_attribute_name]->getEmbeddedEntityTypeMap();
+                foreach ($mirrored_value as $pos => $mirrored_entity) {
+                	$mirrored_entity_prefix = $mirrored_entity->getType()->getPrefix();
+                	if (isset($mirrored_value_type_map[$mirrored_entity_prefix])) {
+                        $mirrored_value->removeItem($mirrored_entity);
+                        $mirrored_value->insertAt(
+                            $pos,
+                            $mirrored_value_type_map[$mirrored_entity_prefix]->createEntity(
+                                $mirrored_entity->toNative(),
+                                $mirrored_entity->getParent()
+                            )
+                        );
+                    } else {
+                    	$this->logger->debug(
+                            sprintf(
+                                'Mirrored embedded entity of type "%s" was not found in the projection definition.',
+                                $mirrored_entity_prefix
+                            )
+                    	);
+                    }
+                }
+            }
             $mirrored_values[$mirrored_attribute_name] = $mirrored_value;
         }
+        
         return $projection->getType()->createEntity(
             array_merge($projection->toNative(), $mirrored_values),
             $projection->getParent()
