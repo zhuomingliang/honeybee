@@ -315,7 +315,7 @@ class ProjectionUpdater extends EventHandler
             }
             $mirrored_values[$mirrored_attribute_name] = $mirrored_value;
         }
-        
+
         return $projection->getType()->createEntity(
             array_merge($projection->toNative(), $mirrored_values),
             $projection->getParent()
