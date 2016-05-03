@@ -36,8 +36,7 @@ abstract class EntityRenderer extends Renderer
 
         $params = parent::getTemplateParameters();
 
-        $params['css'] = $this->getOption('css', '');
-        $params['css'] .= $parent_attribute !== null ? ' hb-embed-item' : null;
+        $params['has_parent_attribute'] = $parent_attribute !== null;
         $params['grouped_base_path'] = ArrayToolkit::flattenToArrayPath($group_parts);
         $params['resource'] = $entity->toArray();
         $params['entity_type'] = $entity->getType()->getPrefix();
@@ -194,8 +193,9 @@ abstract class EntityRenderer extends Renderer
 
     protected function lookupViewTemplate()
     {
-        $view_template_name = $this->getOption('view_template_name', 'default.resource');
-        if (!$this->hasOption('view_template')) {
+        $view_template_name = $this->getOption('view_template_name');
+        if (!$this->hasOption('view_template_name')) {
+            // should it be different for glances?
             $view_template_name = $this->name_resolver->resolve($this->getPayload('subject'));
         }
 

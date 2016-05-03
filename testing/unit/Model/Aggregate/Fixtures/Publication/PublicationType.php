@@ -21,8 +21,8 @@ class PublicationType extends EntityType
         return array_merge(
             parent::getDefaultAttributes(),
             [
-                'year' => new IntegerAttribute('year', $this, [ 'mandatory' => true ]),
-                'description' => new TextAttribute('description', $this)
+                new IntegerAttribute('year', $this, [ 'mandatory' => true ]),
+                new TextAttribute('description', $this)
             ]
         );
     }

@@ -5,12 +5,10 @@ namespace Honeybee\Infrastructure\Command;
 use Assert\Assertion;
 use Honeybee\Common\Error\RuntimeError;
 use Honeybee\Common\Util\StringToolkit;
-use Ramsey\Uuid\Uuid;
 use ReflectionClass;
-use ReflectionProperty;
 use Shrink0r\Monatic\Error;
 use Shrink0r\Monatic\Success;
-use Trellis\Common\Object;
+use Shrink0r\Monatic\Result;
 
 class CommandBuilder implements CommandBuilderInterface
 {
@@ -26,6 +24,11 @@ class CommandBuilder implements CommandBuilderInterface
         $this->command_state = [];
     }
 
+    public function getCommandClass()
+    {
+        return $this->command_class;
+    }
+
     /**
      * @return Result
      */
@@ -34,9 +37,8 @@ class CommandBuilder implements CommandBuilderInterface
         $result = $this->sanitizeCommandState($this->command_class, $this->command_state);
 
         if ($result instanceof Success) {
-            return Success::unit(
-                new $this->command_class($result->get())
-            );
+            $command = new $this->command_class($result->get());
+            return Success::unit($command);
         }
 
         return $result;
@@ -48,8 +50,8 @@ class CommandBuilder implements CommandBuilderInterface
     public function __call($method, array $args)
     {
         if (1 === preg_match('/^with(\w+)/', $method, $matches) && count($args) === 1) {
-            $prop_name = StringToolkit::asSnakeCase($matches[1]);
-            $this->command_state[$prop_name] = $args[0];
+            $property_name = StringToolkit::asSnakeCase($matches[1]);
+            $this->command_state[$property_name] = $args[0];
         }
 
         return $this;
@@ -63,19 +65,17 @@ class CommandBuilder implements CommandBuilderInterface
         $errors = [];
         $sanitized_state = [];
 
-        foreach ($this->getCommandProperties($command_class) as $prop_name => $prop_info) {
-            if (array_key_exists($prop_name, $command_state)) {
-                $prop_val = $command_state[$prop_name];
-                $result = $this->adoptPropertyValue($prop_name, $prop_val);
+        foreach ($this->getCommandProperties($command_class) as $property_name) {
+            if (array_key_exists($property_name, $command_state)) {
+                $property_value = $command_state[$property_name];
+                $result = $this->adoptPropertyValue($property_name, $property_value);
                 if ($result instanceof Success) {
-                    $sanitized_state[$prop_name] = $result->get();
+                    $sanitized_state[$property_name] = $result->get();
                 } elseif ($result instanceof Error) {
-                    $errors[$prop_name] = $result->get();
+                    $errors[$property_name] = $result->get();
                 } else {
                     throw new RuntimeError('Invalid result type given. Either Success or Error expected.');
                 }
-            } elseif ($prop_info['required']) {
-                $errors[$prop_name] = [ $prop_name, 'required' ];
             }
         }
 
@@ -88,21 +88,11 @@ class CommandBuilder implements CommandBuilderInterface
     protected function getCommandProperties($command_class)
     {
         $command_reflection = new ReflectionClass($command_class);
+
         $properties = [];
-
         foreach ($command_reflection->getProperties() as $property) {
-            $doc_block = $property->getDocComment();
-            $owning_class = $property->getDeclaringClass();
-            $ignore_prop = $is_optional = preg_match('/@CommandBuilder::IGNORE\n/', $doc_block) === 1;
-            $is_generic_object_prop = $owning_class->getName() === Object::CLASS;
-
-            if (!$is_generic_object_prop && !$ignore_prop) {
-                $properties[$property->getName()] = [
-                    'name' => $property->getName(),
-                    'required' =>  !preg_match('/@CommandBuilder::OPTIONAL\n/', $doc_block)
-                ];
-            }
-        };
+            $properties[] = $property->getName();
+        }
 
         return $properties;
     }
@@ -113,9 +103,8 @@ class CommandBuilder implements CommandBuilderInterface
     protected function adoptPropertyValue($prop_name, $prop_value)
     {
         $validation_method = 'validate' . StringToolkit::asStudlyCaps($prop_name);
-        $validation_callable = [ $this, $validation_method ];
         if (method_exists($this, $validation_method)) {
-            return call_user_func($validation_callable, $prop_value);
+            return call_user_func([ $this, $validation_method ], $prop_value);
         }
 
         return Success::unit($prop_value);

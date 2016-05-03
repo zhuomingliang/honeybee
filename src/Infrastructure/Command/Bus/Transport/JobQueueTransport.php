@@ -30,6 +30,7 @@ class JobQueueTransport extends CommandTransport
         $this->exchange = $exchange;
         $this->job_service = $job_service;
         $this->command_bus = $command_bus;
+        $this->queue_name = $queue_name;
     }
 
     public function send(CommandInterface $command)
@@ -41,7 +42,7 @@ class JobQueueTransport extends CommandTransport
             ),
             new Settings(
                 [
-                    'route_key' => $this->queue_name ?: $command->getType(),
+                    'routing_key' => $this->queue_name ?: $command->getType(),
                     'exchange' => $this->exchange
                 ]
             )

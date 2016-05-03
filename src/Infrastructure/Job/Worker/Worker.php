@@ -2,29 +2,25 @@
 
 namespace Honeybee\Infrastructure\Job\Worker;
 
-use Honeybee\Common\Util\JsonToolkit;
-use Honeybee\Common\Error\ParseError;
-use Honeybee\Common\Error\RuntimeError;
-use Honeybee\Infrastructure\Config\ConfigInterface;
-use Honeybee\Infrastructure\Job\JobInterface;
-use Honeybee\ServiceLocatorInterface;
-use Honeybee\Infrastructure\DataAccess\Connector\RabbitMqConnector;
-use Honeybee\Infrastructure\Job\JobServiceInterface;
 use Exception;
+use Honeybee\Common\Error\RuntimeError;
+use Honeybee\Common\Util\JsonToolkit;
+use Honeybee\Infrastructure\Job\JobService;
+use Honeybee\Infrastructure\Job\JobServiceInterface;
+use Honeybee\Infrastructure\Config\ConfigInterface;
 
 class Worker implements WorkerInterface
 {
     protected $running = false;
 
-    protected $connector;
+    protected $job_service;
 
     protected $config;
 
-    protected $job_service;
-
-    public function __construct(RabbitMqConnector $connector, ConfigInterface $config, JobServiceInterface $job_service)
+    public function __construct(JobServiceInterface $job_service, ConfigInterface $config)
     {
-        $this->connector = $connector;
+        //@note probably better if we could specify a channel and load the transport instead of
+        //specifying service configuration on the command line
         $this->config = $config;
         $this->job_service = $job_service;
     }
@@ -34,33 +30,10 @@ class Worker implements WorkerInterface
         if ($this->running === true) {
             return false;
         }
-
-        $this->validateSetup();
-
         $this->running = true;
 
-        $exchange_name = $this->config->get('exchange');
-        $queue_name = $this->config->get('queue');
-        $channel = $this->connector->getConnection()->channel();
-
-        $channel->basic_qos(null, 1, null);
-        $channel->exchange_declare($exchange_name, 'direct', false, true, false);
-        $channel->queue_declare($queue_name, false, true, false, false);
-
-        $bindings = (array)$this->config->get('bindings', []);
-        if (empty($bindings)) {
-            $channel->queue_bind($queue_name, $exchange_name, 'default');
-        } else {
-            foreach ($bindings as $binding) {
-                $channel->queue_bind($queue_name, $exchange_name, $binding);
-            }
-        }
-
-        $message_callback = function ($message) {
-            $this->onMessageReceived($message);
-        };
-        $channel->basic_consume($queue_name, false, true, false, false, false, $message_callback);
-
+        $this->validateSetup();
+        $channel = $this->connectChannel();
         while ($this->running && count($channel->callbacks)) {
             $channel->wait();
         }
@@ -70,44 +43,54 @@ class Worker implements WorkerInterface
     protected function validateSetup()
     {
         $exchange_name = $this->config->get('exchange');
-        $queue_name = $this->config->get('queue');
+        $job = $this->config->get('job');
 
         if (!$exchange_name) {
-            throw new RuntimeError("Missing required 'exchange_name' config setting.");
+            throw new RuntimeError("Missing required 'exchange' config setting.");
         }
-        if (!$queue_name) {
-            throw new RuntimeError("Missing required 'queue_name' config setting.");
+
+        if (!$job) {
+            throw new RuntimeError("Missing required 'job' config setting.");
         }
     }
 
-    protected function onMessageReceived($job_message)
+    protected function connectChannel()
     {
-        $delivery_info = $job_message->delivery_info;
-        $channel = $delivery_info['channel'];
-        $delivery_tag = $delivery_info['delivery_tag'];
+        $exchange_name = $this->config->get('exchange');
+        $job_name = $this->config->get('job');
+        $job_settings = $this->job_service->getJob($job_name)->get('settings');
+        $queue_name = $job_settings->get('queue');
+        $routing_key = $job_settings->get('routing_key');
 
+        $this->job_service->initialize($exchange_name);
+        $this->job_service->initializeQueue($exchange_name, $queue_name, $routing_key);
+
+        $message_callback = function ($message) {
+            $this->onJobScheduledForExecution($message);
+        };
+
+        return $this->job_service->consume($queue_name, $message_callback);
+    }
+
+    protected function onJobScheduledForExecution($job_message)
+    {
         try {
-            $execution_state = $this->job_service->createJob(JsonToolkit::parse($job_message->body))->run();
-        } catch (Exception $runtime_error) {
-            $execution_state = JobInterface::STATE_FATAL;
-            // @todo appropiate error-logging
-            error_log(__METHOD__ . ' - ' . $runtime_error->getMessage());
+            $delivery_info = $job_message->delivery_info;
+            $channel = $delivery_info['channel'];
+            $delivery_tag = $delivery_info['delivery_tag'];
+            $job_state = JsonToolkit::parse($job_message->body);
+            $job = $this->job_service->createJob($job_state, $this->config->get('job'));
+            $job->run();
+        } catch (Exception $error) {
+            if ($job->getStrategy()->canRetry()) {
+                $this->job_service->retry($job, $delivery_info['exchange'] . JobService::WAIT_SUFFIX);
+            } else {
+                $this->job_service->fail($job, $delivery_info['exchange'], $error);
+            }
         }
 
-        switch ($execution_state) {
-            case JobInterface::STATE_SUCCESS:
-                $channel->basic_ack($delivery_tag);
-                break;
-
-            case JobInterface::STATE_ERROR:
-                $channel->basic_reject($delivery_tag, true);
-                break;
-
-            case JobInterface::STATE_FATAL:
-                // @todo the job is now dropped from queue as fatal.
-                // we might want to push it to an error queue or to a journal/recovery file for fatal jobs.
-                $channel->basic_reject($delivery_tag, false);
-                break;
-        }
+        // acknowledge the message to remove it from the event queue.
+        // an 'ack' is effectively the same as a 'nack'.
+        $channel->basic_ack($delivery_tag);
     }
 }
