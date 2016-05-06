@@ -10,6 +10,7 @@ use Honeybee\Infrastructure\DataAccess\Query\AttributeCriteria;
 use Honeybee\Infrastructure\DataAccess\Query\CriteriaList;
 use Honeybee\Infrastructure\DataAccess\Query\Query;
 use Honeybee\Infrastructure\DataAccess\Query\QueryServiceInterface;
+use Honeybee\Infrastructure\DataAccess\Query\Comparison\Equals;
 use Honeybee\Infrastructure\Event\Bus\EventBusInterface;
 use Honeybee\Infrastructure\Event\Event;
 use Honeybee\Infrastructure\Event\EventHandler;
@@ -29,14 +30,15 @@ use Honeybee\Projection\ProjectionInterface;
 use Honeybee\Projection\ProjectionTypeInterface;
 use Honeybee\Projection\ProjectionTypeMap;
 use Honeybee\Projection\ProjectionUpdatedEvent;
+use Honeybee\Projection\ReferencedEntity;
 use Psr\Log\LoggerInterface;
+use Trellis\Runtime\Attribute\AttributeMap;
 use Trellis\Runtime\Attribute\AttributeValuePath;
 use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
 use Trellis\Runtime\Entity\EntityInterface;
 use Trellis\Runtime\Entity\EntityList;
 use Trellis\Runtime\Entity\EntityReferenceInterface;
 use Trellis\Runtime\ReferencedEntityTypeInterface;
-use Honeybee\Infrastructure\DataAccess\Query\Comparison\Equals;
 
 class ProjectionUpdater extends EventHandler
 {
@@ -217,7 +219,7 @@ class ProjectionUpdater extends EventHandler
         $embedded_projection = $embedded_projection_type->createEntity($event->getData(), $projection);
         $projection_list = $projection->getValue($embedded_projection_attr->getName());
         if ($embedded_projection_type instanceof ReferencedEntityTypeInterface) {
-            $embedded_projection = $this->mirrorForeignValues($embedded_projection);
+            $embedded_projection = $this->mirrorReferencedValues($embedded_projection);
         }
 
         $projection_list->insertAt($event->getPosition(), $embedded_projection);
@@ -246,7 +248,7 @@ class ProjectionUpdater extends EventHandler
             );
 
             if ($embedded_projection_type instanceof ReferencedEntityTypeInterface) {
-                $projection_to_modify = $this->mirrorForeignValues($projection_to_modify);
+                $projection_to_modify = $this->mirrorReferencedValues($projection_to_modify);
             }
 
             $embedded_projections->insertAt($event->getPosition(), $projection_to_modify);
@@ -270,75 +272,85 @@ class ProjectionUpdater extends EventHandler
         }
     }
 
-    protected function mirrorForeignValues(EntityInterface $projection)
+    /**
+     * Determine and mirror created or changed values for referenced projections
+     */
+    protected function mirrorReferencedValues(EntityReferenceInterface $projection)
     {
-        $mirrored_attributes_map = $projection->getType()->getAttributes()->filter(
-            function ($attribute) {
-                return ((bool)$attribute->getOption('mirrored', false)) === true;
-            }
-        );
+        $mirrored_attributes_map = $this->getMirroredAttributeMap($projection);
+
+        //Don't load reference if mirrored attribute map is empty
         if ($mirrored_attributes_map->isEmpty()) {
-            return $projection;
-        }
-        $referenced_type = $this->projection_type_map->getByClassName(
-            $projection->getType()->getReferencedTypeClass()
-        );
-        $referenced_identifier = $projection->getReferencedIdentifier();
-
-        if ($referenced_identifier === $projection->getRoot()->getIdentifier()) {
-            $referenced_projection = $projection->getRoot(); // self reference, no need to load
+            $referenced_projection = $projection;
         } else {
-            $referenced_projection = $this->loadReferencedProjection($referenced_type, $referenced_identifier);
-            if (!$referenced_projection) {
-                $this->logger->debug('[Zombie Alarm] Unable to resolve referenced projection: ' . $referenced_identifier);
-                return $projection;
-            }
-        }
+            // referenced projection
+            $referenced_type = $this->projection_type_map->getByClassName(
+                $projection->getType()->getReferencedTypeClass()
+            );
+            $referenced_identifier = $projection->getReferencedIdentifier();
 
-        $mirrored_values = [];
-        foreach ($mirrored_attributes_map->getKeys() as $mirrored_attribute_name) {
-            $mirrored_value = $referenced_projection->getValue($mirrored_attribute_name);
-            if ($mirrored_value instanceof EntityList) {
-                $mirrored_value_type_map = $mirrored_attributes_map[$mirrored_attribute_name]->getEmbeddedEntityTypeMap();
-                foreach ($mirrored_value as $pos => $mirrored_entity) {
-                	$mirrored_entity_prefix = $mirrored_entity->getType()->getPrefix();
-                	if (isset($mirrored_value_type_map[$mirrored_entity_prefix])) {
-                        $mirrored_value->removeItem($mirrored_entity);
-                        $mirrored_value->insertAt(
-                            $pos,
-                            $mirrored_value_type_map[$mirrored_entity_prefix]->createEntity(
-                                $mirrored_entity->toNative(),
-                                $mirrored_entity->getParent()
-                            )
-                        );
-                    } else {
-                    	$this->logger->debug(
-                            sprintf(
-                                'Mirrored embedded entity of type "%s" was not found in the projection definition.',
-                                $mirrored_entity_prefix
-                            )
-                    	);
-                    }
+            if ($referenced_identifier === $projection->getRoot()->getIdentifier()) {
+                $referenced_projection = $projection->getRoot(); // self reference, no need to load
+            } else {
+                $referenced_projection = $this->loadReferencedProjection($referenced_type, $referenced_identifier);
+                if (!$referenced_projection) {
+                    $this->logger->debug('[Zombie Alarm] Unable to resolve referenced projection: ' . $referenced_identifier);
+                    return $projection;
                 }
             }
-            $mirrored_values[$mirrored_attribute_name] = $mirrored_value;
         }
 
-        return $projection->getType()->createEntity(
-            array_merge($projection->toNative(), $mirrored_values),
-            $projection->getParent()
-        );
+        // Add default attribute values
+        $mirrored_values = $this->mirrorEntityValues($mirrored_attributes_map, $referenced_projection);
+        $mirrored_values['@type'] = $projection->getType()->getPrefix();
+        $mirrored_values['identifier'] = $projection->getIdentifier();
+        $mirrored_values['referenced_identifier'] = $projection->getReferencedIdentifier();
+
+        return $projection->getType()->createEntity($mirrored_values, $projection->getParent());
     }
 
-    protected function loadReferencedProjection(EntityTypeInterface $referenced_type, $identifier)
+    protected function mirrorEntityValues(AttributeMap $mirrored_attributes_map, EntityInterface $entity)
     {
-        $search_result = $this->getFinder($referenced_type)->getByIdentifier($identifier);
-        if (!$search_result->hasResults()) {
-            return null;
+        // Add default attribute values
+        $mirrored_values['@type'] = $entity->getType()->getPrefix();
+        $mirrored_values['identifier'] = $entity->getIdentifier();
+        if ($entity instanceof EntityReferenceInterface) {
+            $mirrored_values['referenced_identifier'] = $entity->getReferencedIdentifier();
         }
-        return $search_result->getFirstResult();
+
+        // Now we iterate the mirrored attributes and prepare a new entity for return
+        $entity_attribute_map = $entity->getType()->getAttributes();
+        foreach ($entity_attribute_map->getKeys() as $entity_attribute_name) {
+            if ($mirrored_attributes_map->hasKey($entity_attribute_name)) {
+                $mirrored_value = $entity->getValue($entity_attribute_name);
+                // Recursively mirror entity lists
+                if ($mirrored_value instanceof EntityList) {
+                    $mirrored_value_type_map = $mirrored_attributes_map[$entity_attribute_name]->getEmbeddedEntityTypeMap();
+                    foreach ($mirrored_value as $position => $mirrored_entity) {
+                        $mirrored_entity_prefix = $mirrored_entity->getType()->getPrefix();
+                        if ($mirrored_value_type_map->hasKey($mirrored_entity_prefix)) {
+                            $mirrored_entity_attributes_map = $this->getMirroredAttributeMap($mirrored_entity);
+                            $mirrored_value->removeItem($mirrored_entity);
+                            $mirrored_value->insertAt(
+                                $position,
+                                $mirrored_value_type_map[$mirrored_entity_prefix]->createEntity(
+                                    $this->mirrorEntityValues($mirrored_entity_attributes_map, $mirrored_entity),
+                                    $mirrored_entity->getParent()
+                                )
+                            );
+                        }
+                    }
+                }
+                $mirrored_values[$entity_attribute_name] = $mirrored_value;
+            }
+        }
+
+        return $mirrored_values;
     }
 
+    /**
+     * Determine and mirror changed values from the event to the aggregate root
+     */
     protected function mirrorLocalValues(ProjectionInterface $projection, AggregateRootEventInterface $event)
     {
         $affected_attributes = array_keys($event->getData());
@@ -376,11 +388,11 @@ class ProjectionUpdater extends EventHandler
 
         foreach ($attributes_to_update as $attribute_path => $mirror_attributes) {
             $reference_embeds = AttributeValuePath::getAttributeValueByPath($projection, $attribute_path);
-            foreach ($reference_embeds as $pos => $reference_embed) {
+            foreach ($reference_embeds as $position => $reference_embed) {
                 if ($reference_embed->getReferencedIdentifier() === $event->getAggregateRootIdentifier()) {
                     $reference_embeds->removeItem($reference_embed);
                     $reference_embeds->insertAt(
-                        $pos,
+                        $position,
                         $reference_embed->getType()->createEntity(
                             array_merge($reference_embed->toNative(), $event->getData()),
                             $reference_embed->getParent()
@@ -391,9 +403,27 @@ class ProjectionUpdater extends EventHandler
         }
     }
 
+    protected function getMirroredAttributeMap(EntityInterface $entity)
+    {
+        return $entity->getType()->getAttributes()->filter(
+            function ($attribute) {
+                return ((bool)$attribute->getOption('mirrored', false)) === true;
+            }
+        );
+    }
+
     protected function loadProjection(AggregateRootEventInterface $event, $identifier = null)
     {
         return $this->getStorageReader($event)->read($identifier ?: $event->getAggregateRootIdentifier());
+    }
+
+    protected function loadReferencedProjection(EntityTypeInterface $referenced_type, $identifier)
+    {
+        $search_result = $this->getFinder($referenced_type)->getByIdentifier($identifier);
+        if (!$search_result->hasResults()) {
+            return null;
+        }
+        return $search_result->getFirstResult();
     }
 
     protected function getEmbeddedEntityTypeFor(EntityInterface $projection, EmbeddedEntityEventInterface $event)

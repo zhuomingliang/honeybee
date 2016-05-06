@@ -1,22 +1,25 @@
 <?php
 
-namespace Honeybee\Tests\Model\Aggregate\Fixtures\Author\Embed;
+namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Reference;
 
-use Honeybee\Model\Aggregate\EmbeddedEntityType;
+use Honeybee\Projection\ReferencedEntityType;
 use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
+use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 
-class BookType extends EmbeddedEntityType
+class TeamType extends ReferencedEntityType
 {
     public function __construct(EntityTypeInterface $parent = null, AttributeInterface $parent_attribute = null)
     {
         parent::__construct(
-            'Book',
-            [],
+            'Team',
+            [
+                new Text('name', $this, [ 'mirrored' => true ]),
+            ],
             new Options(
                 [
-                    'referenced_type' => '\\Honeybee\\Tests\\Model\\Aggregate\\Fixtures\\Book\\BookType',
+                    'referenced_type' => '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Team\\TeamType',
                     'identifying_attribute' => 'identifier',
                 ]
             ),
@@ -27,6 +30,6 @@ class BookType extends EmbeddedEntityType
 
     public static function getEntityImplementor()
     {
-        return '\\Honeybee\\Tests\\Model\\Aggregate\\Fixtures\\Author\\Reference\\Book';
+        return Team::CLASS;
     }
 }
