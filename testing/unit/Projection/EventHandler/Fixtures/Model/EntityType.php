@@ -11,6 +11,8 @@ abstract class EntityType extends AggregateRootType
 
     const PACKAGE = 'ProjectionFixtures';
 
+    const NAMESPACE_PREFIX = '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Model\\';
+
     protected $workflow_state_machine;
 
     public function __construct($name, StateMachineInterface $state_machine)

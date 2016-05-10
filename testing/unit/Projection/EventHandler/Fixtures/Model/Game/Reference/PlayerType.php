@@ -3,6 +3,7 @@
 namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Game\Reference;
 
 use Honeybee\Model\Aggregate\ReferencedEntityType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\EntityType;
 use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
@@ -22,7 +23,7 @@ class PlayerType extends ReferencedEntityType
                     $this,
                     [
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Model\\Game\\Embed\\ProfileType',
+                            EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
                         ]
                     ]
                 ),
@@ -31,14 +32,14 @@ class PlayerType extends ReferencedEntityType
                     $this,
                     [
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Model\\Game\\Embed\\ProfileType',
+                            EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
                         ]
                     ]
                 ),
             ],
             new Options(
                 [
-                    'referenced_type' => '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Model\\Player\\PlayerType',
+                    'referenced_type' => EntityType::NAMESPACE_PREFIX . 'Player\\PlayerType',
                     'identifying_attribute' => 'identifier',
                 ]
             ),

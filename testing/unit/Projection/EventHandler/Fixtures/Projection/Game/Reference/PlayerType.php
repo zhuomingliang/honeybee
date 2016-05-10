@@ -3,6 +3,7 @@
 namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Reference;
 
 use Honeybee\Projection\ReferencedEntityType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
 use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
@@ -23,7 +24,7 @@ class PlayerType extends ReferencedEntityType
                     [
                         'mirrored' => true,
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Game\\Embed\\ProfileType',
+                            ProjectionType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
                         ]
                     ]
                 ),
@@ -33,14 +34,14 @@ class PlayerType extends ReferencedEntityType
                     [
                         'mirrored' => false,
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Game\\Embed\\ProfileType',
+                            ProjectionType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
                         ]
                     ]
                 ),
             ],
             new Options(
                 [
-                    'referenced_type' => '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Player\\PlayerType',
+                    'referenced_type' => ProjectionType::NAMESPACE_PREFIX . 'Player\\PlayerType',
                     'identifying_attribute' => 'identifier',
                 ]
             ),

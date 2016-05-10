@@ -5,8 +5,8 @@ namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player;
 use Trellis\Common\Options;
 use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
-use Workflux\StateMachine\StateMachineInterface;
 use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
+use Workflux\StateMachine\StateMachineInterface;
 
 class PlayerType extends ProjectionType
 {
@@ -26,7 +26,7 @@ class PlayerType extends ProjectionType
                     $this,
                     [
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Player\\Embed\\ProfileType',
+                            self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType',
                         ]
                     ]
                 ),
@@ -35,7 +35,7 @@ class PlayerType extends ProjectionType
                     $this,
                     [
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Player\\Embed\\ProfileType',
+                            self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType',
                         ]
                     ]
                 ),

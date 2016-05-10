@@ -10,9 +10,4 @@ class Player extends AggregateRoot
     {
         return $this->getValue('name');
     }
-
-    public function setName($name)
-    {
-        return $this->setValue('name', $name);
-    }
 }

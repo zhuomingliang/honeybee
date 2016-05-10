@@ -3,6 +3,7 @@
 namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Embed;
 
 use Honeybee\EntityType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
 use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
@@ -26,7 +27,7 @@ class ProfileType extends EntityType
                     [
                         'mirrored' => true,
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Player\\Reference\\TeamType',
+                            ProjectionType::NAMESPACE_PREFIX . 'Player\\Reference\\TeamType',
                         ]
                     ],
                     $parent_attribute
@@ -37,7 +38,7 @@ class ProfileType extends EntityType
                     [
                         'mirrored' => true,
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Player\\Embed\\BadgeType',
+                            ProjectionType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType',
                         ]
                     ],
                     $parent_attribute
@@ -48,7 +49,7 @@ class ProfileType extends EntityType
                     [
                         'mirrored' => false,
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Player\\Embed\\BadgeType',
+                            ProjectionType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType',
                         ]
                     ],
                     $parent_attribute

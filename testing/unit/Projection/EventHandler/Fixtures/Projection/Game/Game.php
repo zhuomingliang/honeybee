@@ -11,8 +11,8 @@ class Game extends Projection
         return $this->getValue('title');
     }
 
-    public function setTitle($title)
+    public function getPlayers()
     {
-        return $this->setValue('title', $title);
+        return $this->getValue('players');
     }
 }

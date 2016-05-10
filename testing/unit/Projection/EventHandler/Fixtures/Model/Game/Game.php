@@ -10,9 +10,4 @@ class Game extends AggregateRoot
     {
         return $this->getValue('title');
     }
-
-    public function setTitle($title)
-    {
-        return $this->setValue('title', $title);
-    }
 }

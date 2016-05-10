@@ -3,6 +3,7 @@
 namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Reference;
 
 use Honeybee\Projection\ReferencedEntityType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
 use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
@@ -19,7 +20,7 @@ class TeamType extends ReferencedEntityType
             ],
             new Options(
                 [
-                    'referenced_type' => '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\Team\\TeamType',
+                    'referenced_type' => ProjectionType::NAMESPACE_PREFIX . 'Team\\TeamType',
                     'identifying_attribute' => 'identifier',
                 ]
             ),

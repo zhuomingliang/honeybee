@@ -11,6 +11,8 @@ abstract class ProjectionType extends BaseProjectionType
 
     const PACKAGE = 'ProjectionFixtures';
 
+    const NAMESPACE_PREFIX = '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Projection\\';
+
     protected $workflow_state_machine;
 
     public function __construct($name, StateMachineInterface $state_machine)

@@ -26,7 +26,7 @@ class PlayerType extends EntityType
                     $this,
                     [
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Model\\Player\\Embed\\ProfileType',
+                            self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType',
                         ]
                     ]
                 ),
@@ -35,7 +35,7 @@ class PlayerType extends EntityType
                     $this,
                     [
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Model\\Player\\Embed\\ProfileType',
+                            self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType',
                         ]
                     ]
                 ),

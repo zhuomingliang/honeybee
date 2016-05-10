@@ -6,4 +6,8 @@ use Honeybee\Projection\ReferencedEntity;
 
 class Player extends ReferencedEntity
 {
+    public function getName()
+    {
+        return $this->getValue('name');
+    }
 }

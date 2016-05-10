@@ -10,9 +10,4 @@ class Team extends Projection
     {
         return $this->getValue('name');
     }
-
-    public function setName($name)
-    {
-        return $this->setValue('name', $name);
-    }
 }

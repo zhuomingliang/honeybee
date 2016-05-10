@@ -3,6 +3,7 @@
 namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Game\Embed;
 
 use Honeybee\Model\Aggregate\EmbeddedEntityType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\EntityType;
 use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
@@ -24,7 +25,7 @@ class ProfileType extends EmbeddedEntityType
                     $this,
                     [
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Model\\Game\\Embed\\BadgeType',
+                            EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\BadgeType',
                         ]
                     ],
                     $parent_attribute
@@ -34,7 +35,7 @@ class ProfileType extends EmbeddedEntityType
                     $this,
                     [
                         'entity_types' => [
-                            '\\Honeybee\\Tests\\Projection\\EventHandler\\Fixtures\\Model\\Game\\Embed\\BadgeType',
+                            EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\BadgeType',
                         ]
                     ],
                     $parent_attribute
