@@ -16,7 +16,7 @@ class TeamType extends ReferencedEntityType
         parent::__construct(
             'Team',
             [
-                new Text('name', $this, [ 'mirrored' => true ]),
+                new Text('name', $this, [ 'mirrored' => true ], $parent_attribute),
             ],
             new Options(
                 [

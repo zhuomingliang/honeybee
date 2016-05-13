@@ -47,7 +47,6 @@ class ProfileType extends EntityType
                     'unmirrored_badges',
                     $this,
                     [
-                        'mirrored' => false,
                         'entity_types' => [
                             ProjectionType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType',
                         ]

@@ -35,6 +35,7 @@ class GameType extends ProjectionType
                     'players',
                     $this,
                     [
+                        'mirrored' => true,
                         'entity_types' => [
                             self::NAMESPACE_PREFIX . 'Game\\Reference\\PlayerType',
                         ]

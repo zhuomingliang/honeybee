@@ -40,7 +40,7 @@ return [
     ],
     'references' => [
         'player' => [
-            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\PlayerType',
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
             'identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
             'revision' => 1,
             'uuid' => 'a726301d-dbae-4fb6-91e9-a19188a17e71',

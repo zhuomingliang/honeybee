@@ -1,13 +1,13 @@
 <?php
 
-namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Team;
+namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Team;
 
 use Trellis\Common\Options;
 use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\EntityType;
 use Workflux\StateMachine\StateMachineInterface;
 
-class TeamType extends ProjectionType
+class TeamType extends EntityType
 {
     public function __construct(StateMachineInterface $state_machine)
     {

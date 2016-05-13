@@ -17,7 +17,7 @@ class PlayerType extends ReferencedEntityType
         parent::__construct(
             'Player',
             [
-                new Text('name', $this, []),
+                new Text('name', $this, [], $parent_attribute),
                 new EmbeddedEntityListAttribute(
                     'profiles',
                     $this,
@@ -25,7 +25,8 @@ class PlayerType extends ReferencedEntityType
                         'entity_types' => [
                             EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
                         ]
-                    ]
+                    ],
+                    $parent_attribute
                 ),
                 new EmbeddedEntityListAttribute(
                     'unmirrored_profiles',
@@ -34,7 +35,8 @@ class PlayerType extends ReferencedEntityType
                         'entity_types' => [
                             EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
                         ]
-                    ]
+                    ],
+                    $parent_attribute
                 ),
             ],
             new Options(

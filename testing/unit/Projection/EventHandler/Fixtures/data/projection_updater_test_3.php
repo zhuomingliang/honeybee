@@ -53,7 +53,7 @@ return [
     ],
     'references' => [
         'player1' => [
-            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\PlayerType',
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
             'identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
             'revision' => 1,
             'uuid' => 'a726301d-dbae-4fb6-91e9-a19188a17e71',
@@ -86,7 +86,7 @@ return [
             ]
         ],
         'player2' => [
-            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\PlayerType',
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
             'identifier' => 'honeybee.fixtures.player-48fde7c4-7889-42db-8522-6106bf85d58a-de_DE-1',
             'revision' => 1,
             'uuid' => '48fde7c4-7889-42db-8522-6106bf85d58a',

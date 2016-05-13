@@ -149,6 +149,7 @@ class ProjectionUpdater extends EventHandler
 
         $child_path_parts = [ $child_projection->getMaterializedPath(), $child_projection->getIdentifier() ];
         $recursive_children_result = $this->getQueryService()->find(
+            // @todo scan and scroll support
             new Query(
                 new CriteriaList,
                 new CriteriaList(

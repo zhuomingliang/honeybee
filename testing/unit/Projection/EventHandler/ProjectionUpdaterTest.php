@@ -52,13 +52,14 @@ class ProjectionUpdaterTest extends TestCase
         //@todo check the invocation count expectation matchers are working
         $mock_finder_result = \Mockery::mock(FinderResult::CLASS);
         $mock_finder_result->shouldReceive('hasResults')->times(count($references))->andReturn(true);
-        foreach ($references as $reference_name => $reference_state) {
+        foreach ($references as $reference_state) {
             $projection = $this->projection_type_map
-                ->getByClassName($reference_state['@type'])
+                ->getByEntityImplementor($reference_state['@type'])
                 ->createEntity($reference_state);
             $mock_finder_result->shouldReceive('getFirstResult')->once()->andReturn($projection);
         }
 
+        // build mock finder responses
         $mock_finder = \Mockery::mock(FinderInterface::CLASS);
         foreach ($event['embedded_entity_events'] as $embedded_entity_event) {
             if (isset($embedded_entity_event['data']['referenced_identifier'])) {
@@ -69,11 +70,12 @@ class ProjectionUpdaterTest extends TestCase
             }
         }
 
+        // prepare storage writer expectations
         $mock_storage_writer = \Mockery::mock(ProjectionWriter::CLASS);
         $mock_storage_writer->shouldReceive('write')->once()->with(\Mockery::on(
-            function ($argument) use ($expected) {
+            function ($projection) use ($expected) {
                 // dump arrays here if required for debugging
-                return $argument->toArray() === $expected;
+                return $projection->toArray() === $expected;
             }
         ));
 
@@ -81,7 +83,7 @@ class ProjectionUpdaterTest extends TestCase
         $mock_data_access_service->shouldReceive('getFinder')->once()->andReturn($mock_finder);
         $mock_data_access_service->shouldReceive('getStorageWriter')->once()->andReturn($mock_storage_writer);
 
-        // This section sets up expectations for aggregate root modification events
+        // Set up expectations for aggregate root modification events
         if (!empty($aggregate_root)) {
             $aggregate_root = $this->projection_type_map
                 ->getByClassName($aggregate_root['@type'])
@@ -93,6 +95,7 @@ class ProjectionUpdaterTest extends TestCase
             $mock_data_access_service->shouldReceive('getStorageReader')->once()->andReturn($mock_storage_reader);
         }
 
+        // prepare and test subject
         $projection_updater = new ProjectionUpdater(
             new ArrayConfig([]),
             new NullLogger,
@@ -110,7 +113,7 @@ class ProjectionUpdaterTest extends TestCase
     public function provideTestEvents()
     {
         $tests = [];
-        foreach (glob(__DIR__ . '/Fixtures/data/*.php') as $filename) {
+        foreach (glob(__DIR__ . '/Fixtures/data/projection_updater*.php') as $filename) {
             $tests[] = include $filename;
         }
         return $tests;
