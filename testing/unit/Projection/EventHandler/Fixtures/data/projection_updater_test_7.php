@@ -164,33 +164,8 @@ return [
                         'identifier' => '7b446909-9e43-42fb-a043-969463747e2a',
                         'alias' => 'mockprofile1',
                         'tags' => [ 'mock', 'player', 'profile', 'one' ],
-                        'teams' => [
-                            [
-                                '@type' => 'team',
-                                'identifier' => '704856e1-28a3-4069-8055-4ff4fd2f3b83',
-                                'referenced_identifier' =>
-                                    'honeybee.fixtures.team-5cf33cf1-554b-40be-98e7-ef7b4e98ec8c-de_DE-1',
-                                'name' => 'Super Clan'
-                            ],
-                            [
-                                '@type' => 'team',
-                                'identifier' => '49dd5a78-0590-483c-a3f4-03344e93a314',
-                                'referenced_identifier' =>
-                                    'honeybee.fixtures.team-5a0862fb-b7bc-7d1a-5212-3ade34acfcea-de_DE-1',
-                                'name' => 'Burst City'
-                            ]
-                        ],
-                        'badges' => [
-                            [
-                                '@type' => 'badge',
-                                'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
-                                'award' => 'High Score'
-                            ]
-                        ],
-                        'unmirrored_badges' => []
                     ]
-                ],
-                'unmirrored_profiles' => []
+                ]
             ]
         ]
     ]

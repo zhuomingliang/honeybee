@@ -122,27 +122,9 @@ return [
                         '@type' => 'profile',
                         'identifier' => '7b446909-9e43-42fb-a043-969463747e2a',
                         'alias' => 'mockprofile1',
-                        'tags' => [ 'mock', 'player', 'profile', 'one' ],
-                        'teams' => [
-                            [
-                                '@type' => 'team',
-                                'identifier' => '704856e1-28a3-4069-8055-4ff4fd2f3b83',
-                                'referenced_identifier' =>
-                                    'honeybee.fixtures.team-5cf33cf1-554b-40be-98e7-ef7b4e98ec8c-de_DE-1',
-                                'name' => 'Super Clan'
-                            ]
-                        ],
-                        'badges' => [
-                            [
-                                '@type' => 'badge',
-                                'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
-                                'award' => 'High Score'
-                            ]
-                        ],
-                        'unmirrored_badges' => []
+                        'tags' => [ 'mock', 'player', 'profile', 'one' ]
                     ]
-                ],
-                'unmirrored_profiles' => []
+                ]
             ]
         ]
     ]

@@ -75,6 +75,7 @@ class ProjectionUpdaterTest extends TestCase
         $mock_storage_writer->shouldReceive('write')->once()->with(\Mockery::on(
             function ($projection) use ($expected) {
                 // dump arrays here if required for debugging
+//                 var_dump($projection->toArray()); die;
                 return $projection->toArray() === $expected;
             }
         ));

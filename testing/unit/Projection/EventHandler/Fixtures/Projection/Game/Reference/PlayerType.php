@@ -29,16 +29,6 @@ class PlayerType extends ReferencedEntityType
                     ],
                     $parent_attribute
                 ),
-                new EmbeddedEntityListAttribute(
-                    'unmirrored_profiles',
-                    $this,
-                    [
-                        'entity_types' => [
-                            ProjectionType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
-                        ]
-                    ],
-                    $parent_attribute
-                ),
             ],
             new Options(
                 [

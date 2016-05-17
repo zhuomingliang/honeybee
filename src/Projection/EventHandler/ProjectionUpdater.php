@@ -272,7 +272,7 @@ class ProjectionUpdater extends EventHandler
      */
     protected function mirrorReferencedValues(EntityReferenceInterface $projection)
     {
-        $mirrored_attribute_map = $this->getMirroredAttributeMap($projection);
+        $mirrored_attribute_map = $this->getMirroredAttributeMap($projection->getType());
 
         // Don't need to load a referenced entity if the mirrored attribute map is empty
         if ($mirrored_attribute_map->isEmpty()) {
@@ -300,7 +300,7 @@ class ProjectionUpdater extends EventHandler
         $mirrored_values['identifier'] = $projection->getIdentifier();
         $mirrored_values['referenced_identifier'] = $projection->getReferencedIdentifier();
         $mirrored_values = array_merge(
-            $this->mirrorEntityValues($mirrored_attribute_map, $referenced_projection),
+            $this->mirrorEntityValues($projection->getType(), $referenced_projection),
             $mirrored_values
         );
 
@@ -310,49 +310,47 @@ class ProjectionUpdater extends EventHandler
     /**
      * Recursively mirror values from the provided entity without loading embedded references
      */
-    protected function mirrorEntityValues(AttributeMap $mirrored_attribute_map, EntityInterface $entity)
+    protected function mirrorEntityValues(EntityTypeInterface $reference_entity_type, EntityInterface $source_entity)
     {
-        // Add default attribute values
-        $mirrored_values['@type'] = $entity->getType()->getPrefix();
-        $mirrored_values['identifier'] = $entity->getIdentifier();
-        if ($entity instanceof EntityReferenceInterface) {
-            $mirrored_values['referenced_identifier'] = $entity->getReferencedIdentifier();
+        // Add default mirrored values
+        $mirrored_values['@type'] = $source_entity->getType()->getPrefix();
+        $mirrored_values['identifier'] = $source_entity->getIdentifier();
+        if ($source_entity instanceof EntityReferenceInterface) {
+            $mirrored_values['referenced_identifier'] = $source_entity->getReferencedIdentifier();
         }
 
-        // Now iterate the mirrored attributes map and append values for return
-        $entity_attribute_map = $entity->getType()->getAttributes();
-        foreach ($entity_attribute_map->getKeys() as $entity_attribute_name) {
-            if ($mirrored_attribute_map->hasKey($entity_attribute_name)) {
-                $mirrored_value = $entity->getValue($entity_attribute_name);
-                // Recursively add mirrored entity lists
+        // iterate the source attributes map
+        $reference_mirror_map = $this->getMirroredAttributeMap($reference_entity_type);
+        $source_mirror_map = $source_entity->getType()->getAttributes();
+        foreach ($source_mirror_map->getKeys() as $mirrored_attribute_name) {
+            if ($reference_mirror_map->hasKey($mirrored_attribute_name)) {
+                $mirrored_value = $source_entity->getValue($mirrored_attribute_name);
                 if ($mirrored_value instanceof EntityList) {
-                    $mirrored_attribute = $mirrored_attribute_map->getItem($entity_attribute_name);
-                    $mirrored_value_type_map = $mirrored_attribute->getEmbeddedEntityTypeMap();
                     foreach ($mirrored_value as $position => $mirrored_entity) {
                         $mirrored_entity_prefix = $mirrored_entity->getType()->getPrefix();
-                        if ($mirrored_value_type_map->hasKey($mirrored_entity_prefix)) {
-                            $mirrored_entity_attribute_map = $this->getMirroredAttributeMap($mirrored_entity);
-                            $mirrored_value->removeItem($mirrored_entity);
-                            $mirrored_value->insertAt(
-                                $position,
-                                $mirrored_value_type_map[$mirrored_entity_prefix]->createEntity(
-                                    $this->mirrorEntityValues($mirrored_entity_attribute_map, $mirrored_entity),
-                                    $mirrored_entity->getParent()
-                                )
-                            );
-                        }
+                        $reference_mirror_type = $reference_mirror_map->getItem($mirrored_attribute_name)
+                            ->getEmbeddedEntityTypeMap()
+                            ->getItem($mirrored_entity_prefix);
+                        $mirrored_value->removeItem($mirrored_entity);
+                        $mirrored_value->insertAt(
+                            $position,
+                            $reference_mirror_type->createEntity(
+                                $this->mirrorEntityValues($reference_mirror_type, $mirrored_entity),
+                                $mirrored_entity->getParent()
+                            )
+                        );
                     }
                 }
-                $mirrored_values[$entity_attribute_name] = $mirrored_value;
+                $mirrored_values[$mirrored_attribute_name] = $mirrored_value;
             }
         }
 
         return $mirrored_values;
     }
 
-    protected function getMirroredAttributeMap(EntityInterface $entity)
+    protected function getMirroredAttributeMap(EntityTypeInterface $entity_type)
     {
-        return $entity->getType()->getAttributes()->filter(
+        return $entity_type->getAttributes()->filter(
             function ($attribute) {
                 return (bool)$attribute->getOption('mirrored', false) === true;
             }

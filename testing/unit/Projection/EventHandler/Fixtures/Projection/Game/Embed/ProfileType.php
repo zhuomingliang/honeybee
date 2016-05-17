@@ -9,8 +9,6 @@ use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
 use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 use Trellis\Runtime\Attribute\TextList\TextListAttribute;
-use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
-use Trellis\Runtime\Attribute\EntityReferenceList\EntityReferenceListAttribute;
 
 class ProfileType extends EntityType
 {
@@ -20,39 +18,7 @@ class ProfileType extends EntityType
             'Profile',
             [
                 new Text('alias', $this, [ 'mirrored' => true ], $parent_attribute),
-                new TextListAttribute('tags', $this, [ 'mirrored' => true ], $parent_attribute),
-                new EntityReferenceListAttribute(
-                    'teams',
-                    $this,
-                    [
-                        'mirrored' => true,
-                        'entity_types' => [
-                            ProjectionType::NAMESPACE_PREFIX . 'Game\\Reference\\TeamType',
-                        ]
-                    ],
-                    $parent_attribute
-                ),
-                new EmbeddedEntityListAttribute(
-                    'badges',
-                    $this,
-                    [
-                        'mirrored' => true,
-                        'entity_types' => [
-                            ProjectionType::NAMESPACE_PREFIX . 'Game\\Embed\\BadgeType',
-                        ]
-                    ],
-                    $parent_attribute
-                ),
-                new EmbeddedEntityListAttribute(
-                    'unmirrored_badges',
-                    $this,
-                    [
-                        'entity_types' => [
-                            ProjectionType::NAMESPACE_PREFIX . 'Game\\Embed\\BadgeType',
-                        ]
-                    ],
-                    $parent_attribute
-                ),
+                new TextListAttribute('tags', $this, [ 'mirrored' => true  ], $parent_attribute),
             ],
             new Options([]),
             $parent,

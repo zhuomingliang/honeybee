@@ -126,7 +126,6 @@ return [
                 'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
                 'name' => 'Player 1, No Profiles',
                 'profiles' => [],
-                'unmirrored_profiles' => []
             ]
         ]
     ]

@@ -43,7 +43,6 @@ return [
                     'referenced_identifier' => 'honeybee.fixtures.player-c9a1fd68-e6e5-462c-a544-c86f0812cf6c-de_DE-1',
                     'name' => 'Mr Bean',
                     'profiles' => [],
-                    'unmirrored_profiles' => []
                 ],
                 [
                     '@type' => 'player',
@@ -51,7 +50,6 @@ return [
                     'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
                     'name' => 'Anatoly Karpov',
                     'profiles' => [],
-                    'unmirrored_profiles' => []
                 ]
             ]
         ]
@@ -85,7 +83,6 @@ return [
                     'referenced_identifier' => 'honeybee.fixtures.player-c9a1fd68-e6e5-462c-a544-c86f0812cf6c-de_DE-1',
                     'name' => 'Mr Bean',
                     'profiles' => [],
-                    'unmirrored_profiles' => []
                 ],
                 [
                     '@type' => 'player',
@@ -93,7 +90,6 @@ return [
                     'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
                     'name' => 'Garry Kasparov',
                     'profiles' => [],
-                    'unmirrored_profiles' => []
                 ]
             ]
         ]
