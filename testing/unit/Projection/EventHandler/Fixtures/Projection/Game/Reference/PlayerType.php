@@ -22,7 +22,6 @@ class PlayerType extends ReferencedEntityType
                     'profiles',
                     $this,
                     [
-                        'mirrored' => true,
                         'entity_types' => [
                             ProjectionType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
                         ]

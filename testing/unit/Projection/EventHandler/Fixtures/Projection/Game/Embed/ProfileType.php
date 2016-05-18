@@ -9,6 +9,7 @@ use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
 use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 use Trellis\Runtime\Attribute\TextList\TextListAttribute;
+use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
 
 class ProfileType extends EntityType
 {
@@ -19,6 +20,16 @@ class ProfileType extends EntityType
             [
                 new Text('alias', $this, [ 'mirrored' => true ], $parent_attribute),
                 new TextListAttribute('tags', $this, [ 'mirrored' => true  ], $parent_attribute),
+                new EmbeddedEntityListAttribute(
+                    'badges',
+                    $this,
+                    [
+                        'entity_types' => [
+                            ProjectionType::NAMESPACE_PREFIX . 'Game\\Embed\\BadgeType',
+                        ]
+                    ],
+                    $parent_attribute
+                )
             ],
             new Options([]),
             $parent,

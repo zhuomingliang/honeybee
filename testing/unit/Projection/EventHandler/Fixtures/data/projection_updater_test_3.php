@@ -67,7 +67,7 @@ return [
             'metadata' => [],
             'name' => 'Player 1 No Profiles',
             'profiles' => [],
-            'unmirrored_profiles' => [
+            'simple_profiles' => [
                 [
                     '@type' => 'profile',
                     'identifier' => '94a03a00-8420-4ee2-a4f7-0e0ff1989592',
@@ -100,7 +100,7 @@ return [
             'metadata' => [],
             'name' => 'Player 2 No Profiles',
             'profiles' => [],
-            'unmirrored_profiles' => []
+            'simple_profiles' => []
         ]
     ],
     'expected' => [
@@ -124,14 +124,14 @@ return [
                 'identifier' => 'ca8a5117-927a-4f94-8b0d-7b0be6196acf',
                 'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
                 'name' => 'Player 1 No Profiles',
-                'profiles' => [],
+                'profiles' => []
             ],
             [
                 '@type' => 'player',
                 'identifier' => 'd058229c-ef88-4897-92a8-df155e863a2f',
                 'referenced_identifier' => 'honeybee.fixtures.player-48fde7c4-7889-42db-8522-6106bf85d58a-de_DE-1',
                 'name' => 'Player 2 No Profiles',
-                'profiles' => [],
+                'profiles' => []
             ]
         ]
     ]

@@ -28,6 +28,8 @@ use Honeybee\Projection\ProjectionTypeInterface;
 use Honeybee\Projection\ProjectionTypeMap;
 use Honeybee\Projection\ProjectionUpdatedEvent;
 use Trellis\Runtime\Attribute\AttributeMap;
+use Trellis\Runtime\Attribute\AttributePath;
+use Trellis\Runtime\Attribute\AttributeInterface;
 use Trellis\Runtime\Attribute\AttributeValuePath;
 use Trellis\Runtime\Entity\EntityInterface;
 use Trellis\Runtime\Entity\EntityList;
@@ -272,7 +274,11 @@ class ProjectionUpdater extends EventHandler
      */
     protected function mirrorReferencedValues(EntityReferenceInterface $projection)
     {
-        $mirrored_attribute_map = $this->getMirroredAttributeMap($projection->getType());
+        $mirrored_attribute_map = $projection->getType()->getAttributes()->filter(
+            function (AttributeInterface $attribute) {
+                return (bool)$attribute->getOption('mirrored', false) === true;
+            }
+        );
 
         // Don't need to load a referenced entity if the mirrored attribute map is empty
         if ($mirrored_attribute_map->isEmpty()) {
@@ -319,42 +325,48 @@ class ProjectionUpdater extends EventHandler
             $mirrored_values['referenced_identifier'] = $source_entity->getReferencedIdentifier();
         }
 
-        // iterate the source attributes map
-        $reference_mirror_map = $this->getMirroredAttributeMap($reference_entity_type);
-        $source_mirror_map = $source_entity->getType()->getAttributes();
-        foreach ($source_mirror_map->getKeys() as $mirrored_attribute_name) {
-            if ($reference_mirror_map->hasKey($mirrored_attribute_name)) {
-                $mirrored_value = $source_entity->getValue($mirrored_attribute_name);
-                if ($mirrored_value instanceof EntityList) {
-                    foreach ($mirrored_value as $position => $mirrored_entity) {
-                        $mirrored_entity_prefix = $mirrored_entity->getType()->getPrefix();
-                        $reference_mirror_type = $reference_mirror_map->getItem($mirrored_attribute_name)
-                            ->getEmbeddedEntityTypeMap()
-                            ->getItem($mirrored_entity_prefix);
-                        $mirrored_value->removeItem($mirrored_entity);
-                        $mirrored_value->insertAt(
-                            $position,
-                            $reference_mirror_type->createEntity(
-                                $this->mirrorEntityValues($reference_mirror_type, $mirrored_entity),
-                                $mirrored_entity->getParent()
-                            )
-                        );
-                    }
+        // collate the required mirrored attributes map
+        $required_attributes_map = $reference_entity_type->collateAttributes(
+            function (AttributeInterface $attribute) {
+                return (bool)$attribute->getOption('mirrored', false) === true;
+            }
+        );
+
+        // extract our reference target path from the source entity
+        $relative_path_parts = explode('.', $source_entity->getType()->getPrefix());
+        $relative_leaf = end($relative_path_parts);
+
+        // iterate the source attributes and extract the required mirrored values
+        foreach ($required_attributes_map as $required_attribute_path => $required_attribute) {
+            // @todo possible risk of path name collision in greedy regex?
+            $required_attribute_path = preg_replace('#([a-z]+\.)+'.$relative_leaf.'\.#', '', $required_attribute_path);
+            $path_parts = explode('.', $required_attribute_path);
+            if (count($path_parts) === 1) {
+                // Leaf attribute to mirror
+                $mirrored_values[$path_parts[0]] =
+                    AttributeValuePath::getAttributeValueByPath($source_entity, $path_parts[0]);
+            } else {
+                // List attribute to mirror
+                $required_list_path = array_shift($path_parts);
+                $required_list_embed_type_name = array_shift($path_parts);
+                $required_list_attribute =
+                    AttributePath::getAttributeByPath($reference_entity_type, $required_list_path);
+                $source_list_attribute_value =
+                    AttributeValuePath::getAttributeValueByPath($source_entity, $required_list_path);
+                $required_list_embed_type_map = $required_list_attribute->getEmbeddedEntityTypeMap();
+                foreach ($source_list_attribute_value as $position => $source_embedded_entity) {
+                    $source_embedded_entity_prefix = $source_embedded_entity->getType()->getPrefix();
+                    $required_list_embed_type = $required_list_embed_type_map->getItem($source_embedded_entity_prefix);
+                    $mirrored_embedded_entity = $required_list_embed_type->createEntity(
+                        $this->mirrorEntityValues($required_list_embed_type, $source_embedded_entity),
+                        $source_embedded_entity->getParent()
+                    );
+                    $mirrored_values[$required_list_path][$position] = $mirrored_embedded_entity->toArray();
                 }
-                $mirrored_values[$mirrored_attribute_name] = $mirrored_value;
             }
         }
 
         return $mirrored_values;
-    }
-
-    protected function getMirroredAttributeMap(EntityTypeInterface $entity_type)
-    {
-        return $entity_type->getAttributes()->filter(
-            function ($attribute) {
-                return (bool)$attribute->getOption('mirrored', false) === true;
-            }
-        );
     }
 
     protected function loadProjection(AggregateRootEventInterface $event, $identifier = null)

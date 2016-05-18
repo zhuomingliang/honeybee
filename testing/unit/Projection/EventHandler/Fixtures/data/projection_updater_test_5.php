@@ -18,7 +18,7 @@ return [
         'metadata' => []
     ],
     'aggregate_root' => [
-        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\GameType',
+        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
         'identifier' => 'honeybee.fixtures.game-a7cec777-d932-4bbd-8156-261138d3fe39-de_DE-1',
         'revision' => 3,
         'uuid' => 'a7cec777-d932-4bbd-8156-261138d3fe39',
@@ -30,7 +30,7 @@ return [
         'workflow_state' => 'edit',
         'workflow_parameters' => [],
         'metadata' => [],
-        'title' => 'Doom 3',
+        'title' => 'Duke Nukem',
         'challenges' => [],
         'players' => []
     ],

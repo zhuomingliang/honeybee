@@ -19,13 +19,12 @@ class ProfileType extends EntityType
         parent::__construct(
             'Profile',
             [
-                new Text('alias', $this, [ 'mirrored' => true ], $parent_attribute),
-                new TextListAttribute('tags', $this, [ 'mirrored' => true ], $parent_attribute),
+                new Text('alias', $this, [], $parent_attribute),
+                new TextListAttribute('tags', $this, [], $parent_attribute),
                 new EntityReferenceListAttribute(
                     'teams',
                     $this,
                     [
-                        'mirrored' => true,
                         'entity_types' => [
                             ProjectionType::NAMESPACE_PREFIX . 'Player\\Reference\\TeamType',
                         ]
@@ -36,23 +35,12 @@ class ProfileType extends EntityType
                     'badges',
                     $this,
                     [
-                        'mirrored' => true,
                         'entity_types' => [
                             ProjectionType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType',
                         ]
                     ],
                     $parent_attribute
-                ),
-                new EmbeddedEntityListAttribute(
-                    'unmirrored_badges',
-                    $this,
-                    [
-                        'entity_types' => [
-                            ProjectionType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType',
-                        ]
-                    ],
-                    $parent_attribute
-                ),
+                )
             ],
             new Options([]),
             $parent,

@@ -25,14 +25,13 @@ class PlayerType extends ProjectionType
                     'profiles',
                     $this,
                     [
-                        'mirrored' => true,
                         'entity_types' => [
                             self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType',
                         ]
                     ]
                 ),
                 new EmbeddedEntityListAttribute(
-                    'unmirrored_profiles',
+                    'simple_profiles',
                     $this,
                     [
                         'entity_types' => [

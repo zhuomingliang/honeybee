@@ -31,7 +31,7 @@ class PlayerType extends EntityType
                     ]
                 ),
                 new EmbeddedEntityListAttribute(
-                    'unmirrored_profiles',
+                    'simple_profiles',
                     $this,
                     [
                         'entity_types' => [

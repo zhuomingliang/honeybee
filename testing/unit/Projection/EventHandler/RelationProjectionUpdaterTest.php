@@ -73,15 +73,14 @@ class RelationProjectionUpdaterTest extends TestCase
         $mock_query_service->shouldReceive('find')
             ->with(\Mockery::on(
                 function ($query) use ($event) {
-                    $filter_criteria_list = $query->toArray()['filter_criteria_list'];
+                    $filter_criteria_list = $query->toArray()['filter_criteria_list'][1];
+                    // dump filter list here for debugging
+                    $match = false;
                     foreach ($filter_criteria_list as $filter_criteria) {
-                        if (strpos($filter_criteria['attribute_path'], 'referenced_identifier') !== false
-                            && $filter_criteria['comparison']['comparand'] !== $event['aggregate_root_identifier']
-                        ) {
-                            return false;
-                        }
+                        $match = strpos($filter_criteria['attribute_path'], 'referenced_identifier') !== false
+                            && $filter_criteria['comparison']['comparand'] === $event['aggregate_root_identifier'];
                     }
-                    return true;
+                    return $match;
                 }
             ))
             ->times(count($related_projections))

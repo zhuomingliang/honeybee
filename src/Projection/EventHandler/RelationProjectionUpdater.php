@@ -18,10 +18,10 @@ use Honeybee\Model\Event\AggregateRootEventInterface;
 use Honeybee\Projection\ProjectionTypeMap;
 use Psr\Log\LoggerInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
-use Trellis\Runtime\Attribute\AttributeValuePath;
 use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
 use Trellis\Runtime\Entity\EntityList;
 use Trellis\Runtime\Entity\EntityReferenceInterface;
+use Honeybee\Model\Event\EmbeddedEntityEventInterface;
 
 class RelationProjectionUpdater extends EventHandler
 {
@@ -66,26 +66,12 @@ class RelationProjectionUpdater extends EventHandler
             $affected_attributes[] = $embedded_event->getParentAttributeName();
         }
 
-        // build a list of referenced entity list attributes which are affected by this event
-        $referenced_attributes = $this->getRelationProjectionType()->getReferenceAttributes()->filter(
-            function (AttributeInterface $attribute) {
-                $yield = true;
-                while ($attribute->getParent() || !$attribute->getOption('mirrored', false)) {
-                    if (!$attribute->getOption('mirrored', false)) {
-                        $yield = false;
-                        break;
-                    }
-                    $attribute = $attribute->getParent();
-                }
-                return $yield;
-            }
-        );
-
         // Determine whether any mirrored attributes exist on these referenced entities and if
         // so prepare a query to load any projections with matching relations for update
         $attributes_to_update = [];
         $reference_filter_list = new CriteriaList([], CriteriaList::OP_OR);
-        foreach ($referenced_attributes as $attribute_path => $ref_attribute) {
+        $referenced_attributes_map = $this->getRelationProjectionType()->getReferenceAttributes();
+        foreach ($referenced_attributes_map as $attribute_path => $ref_attribute) {
             $mirror_attributes = [];
             foreach ($ref_attribute->getEmbeddedEntityTypeMap() as $reference_embed) {
                 $referenced_type_impl = ltrim($reference_embed->getReferencedTypeClass(), '\\');
@@ -121,11 +107,7 @@ class RelationProjectionUpdater extends EventHandler
             $filter_criteria_list->push(
                 new AttributeCriteria('identifier', new Equals('!' . $event->getAggregateRootIdentifier()))
             );
-            if ($reference_filter_list->getSize() === 1) {
-                $filter_criteria_list->push($reference_filter_list->getFirst());
-            } else {
-                $filter_criteria_list->push($reference_filter_list);
-            }
+            $filter_criteria_list->push($reference_filter_list);
             // @todo scan and scroll support
             $query_result = $this->getQueryService()->find(
                 new Query(
@@ -139,13 +121,7 @@ class RelationProjectionUpdater extends EventHandler
 
             // iterate the related projections from results and merge changes from event data
             $related_projections = new EntityList($query_result->getResults());
-            $updated_projections->append($related_projections->withUpdatedEntities(
-                $event->getData(),
-                function (EntityInterface $entity) use ($event) {
-                    return $entity instanceof EntityReferenceInterface
-                    && $entity->getReferencedIdentifier() === $event->getAggregateRootIdentifier();
-                }
-            ));
+            $updated_projections = $this->updateEntities($related_projections, $event);
         }
 
         // write updated projections to storage
@@ -156,6 +132,24 @@ class RelationProjectionUpdater extends EventHandler
 
         // drop the mic
         return $updated_projections;
+    }
+
+    // brute force merge recursive event data into entities
+    protected function updateEntities(EntityList $entity_list, $event)
+    {
+        $updated_list = $entity_list->withUpdatedEntities(
+            $event->getData(),
+            function (EntityInterface $entity) use ($event) {
+                return ($entity instanceof EntityReferenceInterface && !$event instanceof EmbeddedEntityEventInterface
+                    && $entity->getReferencedIdentifier() === $event->getAggregateRootIdentifier())
+                    || ($event instanceof EmbeddedEntityEventInterface
+                        && $entity->getIdentifier() === $event->getEmbeddedEntityIdentifier());
+            }
+        );
+        foreach ($event->getEmbeddedEntityEvents() as $embedded_entity_event) {
+            $updated_list = $this->updateEntities($updated_list, $embedded_entity_event);
+        }
+        return $updated_list;
     }
 
     protected function buildFieldFilterSpec(EmbeddedEntityListAttribute $embed_attribute)

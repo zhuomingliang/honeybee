@@ -15,7 +15,7 @@ class BadgeType extends EntityType
         parent::__construct(
             'Badge',
             [
-                new Text('award', $this, [ 'mirrored' => true ], $parent_attribute),
+                new Text('award', $this, [], $parent_attribute),
             ],
             new Options([]),
             $parent,

@@ -29,6 +29,18 @@ return [
                 'embedded_entity_type' => 'player',
                 'parent_attribute_name' => 'players',
                 'embedded_entity_events' => []
+            ],
+            [
+                '@type' => 'Honeybee\Model\Task\ModifyAggregateRoot\AddEmbeddedEntity\EmbeddedEntityAddedEvent',
+                'data' => [
+                    'identifier' => 'f1e876f5-7648-42ea-b813-a6c4bd3c8e3f',
+                    'attempts' => 0
+                ],
+                'position' => 0,
+                'embedded_entity_identifier' => 'f1e876f5-7648-42ea-b813-a6c4bd3c8e3f',
+                'embedded_entity_type' => 'challenge',
+                'parent_attribute_name' => 'challenges',
+                'embedded_entity_events' => []
             ]
         ],
         'seq_number' => 1,
@@ -59,20 +71,6 @@ return [
                     'identifier' => '7b446909-9e43-42fb-a043-969463747e2a',
                     'alias' => 'mockprofile1',
                     'tags' => [ 'mock', 'player', 'profile', 'one' ],
-                    'badges' => [
-                        [
-                            '@type' => 'badge',
-                            'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
-                            'award' => 'High Score'
-                        ]
-                    ],
-                    'unmirrored_badges' => [
-                        [
-                            '@type' => 'badge',
-                            'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
-                            'award' => 'Low Score'
-                        ]
-                    ],
                     'teams' => [
                         [
                             '@type' => 'team',
@@ -81,20 +79,40 @@ return [
                                 'honeybee.fixtures.team-5cf33cf1-554b-40be-98e7-ef7b4e98ec8c-de_DE-1',
                             'name' => 'Super Clan'
                         ]
+                    ],
+                    'badges' => [
+                        [
+                            '@type' => 'badge',
+                            'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
+                            'award' => 'High Score'
+                        ],
+                        [
+                            '@type' => 'badge',
+                            'identifier' => '06c5fab2-639d-4832-86dc-11d6d6d05ed2',
+                            'award' => 'Low Score'
+                        ]
                     ]
                 ]
             ],
-            'unmirrored_profiles' => [
+            'simple_profiles' => [
                 [
                     '@type' => 'profile',
                     'identifier' => '94a03a00-8420-4ee2-a4f7-0e0ff1989592',
-                    'alias' => 'hiddenprofile2',
-                    'tags' => [ 'hidden', 'player', 'profile', 'two' ],
-                    'badges' => [],
-                    'unmirrored_badges' => []
+                    'alias' => 'simpleprofile1',
+                    'tags' => [ 'simple', 'player', 'profile', 'one' ],
+                    'teams' => [
+                        [
+                            '@type' => 'team',
+                            'identifier' => '179f4ed5-e7a5-4188-a204-5d1bc90d4413',
+                            'referenced_identifier' =>
+                                'honeybee.fixtures.team-5cf33cf1-554b-40be-98e7-ef7b4e98ec8c-de_DE-1',
+                            'name' => 'Super Clan'
+                        ]
+                    ],
+                    'badges' => []
                 ]
             ]
-        ],
+        ]
     ],
     'expected' => [
         '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
@@ -110,7 +128,13 @@ return [
         'workflow_parameters' => [],
         'metadata' => [],
         'title' => 'Doom 7',
-        'challenges' => [],
+        'challenges' => [
+            [
+                '@type' => 'challenge',
+                'identifier' => 'f1e876f5-7648-42ea-b813-a6c4bd3c8e3f',
+                'attempts' => 0
+            ]
+        ],
         'players' => [
             [
                 '@type' => 'player',
@@ -122,7 +146,19 @@ return [
                         '@type' => 'profile',
                         'identifier' => '7b446909-9e43-42fb-a043-969463747e2a',
                         'alias' => 'mockprofile1',
-                        'tags' => [ 'mock', 'player', 'profile', 'one' ]
+                        'tags' => [ 'mock', 'player', 'profile', 'one' ],
+                        'badges' => [
+                            [
+                                '@type' => 'badge',
+                                'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
+                                'award' => 'High Score'
+                            ],
+                            [
+                                '@type' => 'badge',
+                                'identifier' => '06c5fab2-639d-4832-86dc-11d6d6d05ed2',
+                                'award' => 'Low Score'
+                            ]
+                        ]
                     ]
                 ]
             ]

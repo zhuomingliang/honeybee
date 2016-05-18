@@ -75,7 +75,6 @@ class ProjectionUpdaterTest extends TestCase
         $mock_storage_writer->shouldReceive('write')->once()->with(\Mockery::on(
             function ($projection) use ($expected) {
                 // dump arrays here if required for debugging
-//                 var_dump($projection->toArray()); die;
                 return $projection->toArray() === $expected;
             }
         ));
@@ -87,7 +86,7 @@ class ProjectionUpdaterTest extends TestCase
         // Set up expectations for aggregate root modification events
         if (!empty($aggregate_root)) {
             $aggregate_root = $this->projection_type_map
-                ->getByClassName($aggregate_root['@type'])
+                ->getByEntityImplementor($aggregate_root['@type'])
                 ->createEntity($aggregate_root);
             $mock_storage_reader = \Mockery::mock(ProjectionReader::CLASS);
             $mock_storage_reader->shouldReceive('read')

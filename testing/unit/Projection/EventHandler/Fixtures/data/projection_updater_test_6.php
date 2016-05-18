@@ -44,7 +44,7 @@ return [
                     'identifier' => '5cf33cf1-554b-40be-98e7-ef7b4e98ec8c',
                     'attempts' => 5
                 ],
-                'position' => 0,
+                'position' => 1,
                 'embedded_entity_identifier' => '5cf33cf1-554b-40be-98e7-ef7b4e98ec8c',
                 'embedded_entity_type' => 'challenge',
                 'parent_attribute_name' => 'challenges',
@@ -57,7 +57,7 @@ return [
         'metadata' => []
     ],
     'aggregate_root' => [
-        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\GameType',
+        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
         'identifier' => 'honeybee.fixtures.game-a7cec777-d932-4bbd-8156-261138d3fe39-de_DE-1',
         'revision' => 3,
         'uuid' => 'a7cec777-d932-4bbd-8156-261138d3fe39',
@@ -70,12 +70,20 @@ return [
         'workflow_parameters' => [],
         'metadata' => [],
         'title' => 'Doom 3',
-        'challenges' => [],
+        'challenges' => [
+            [
+                '@type' => 'challenge',
+                'identifier' => 'f1e876f5-7648-42ea-b813-a6c4bd3c8e3f',
+                'attempts' => 0
+            ]
+        ],
         'players' => [
             [
                 '@type' => 'player',
                 'identifier' => '99d68357-595e-41f3-9675-b532a8ed968f',
-                'referenced_identifier' => 'honeybee.fixtures.player-c9a1fd68-e6e5-462c-a544-c86f0812cf6c-de_DE-1'
+                'referenced_identifier' => 'honeybee.fixtures.player-c9a1fd68-e6e5-462c-a544-c86f0812cf6c-de_DE-1',
+                'name' => 'Player to be removed',
+                'profiles' => []
             ]
         ]
     ],
@@ -95,7 +103,7 @@ return [
             'metadata' => [],
             'name' => 'Player 1, No Profiles',
             'profiles' => [],
-            'unmirrored_profiles' => []
+            'simple_profiles' => []
         ]
     ],
     'expected' => [
@@ -115,6 +123,11 @@ return [
         'challenges' => [
             [
                 '@type' => 'challenge',
+                'identifier' => 'f1e876f5-7648-42ea-b813-a6c4bd3c8e3f',
+                'attempts' => 0
+            ],
+            [
+                '@type' => 'challenge',
                 'identifier' => '5cf33cf1-554b-40be-98e7-ef7b4e98ec8c',
                 'attempts' => 5
             ]
@@ -125,7 +138,7 @@ return [
                 'identifier' => 'ca8a5117-927a-4f94-8b0d-7b0be6196acf',
                 'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
                 'name' => 'Player 1, No Profiles',
-                'profiles' => [],
+                'profiles' => []
             ]
         ]
     ]

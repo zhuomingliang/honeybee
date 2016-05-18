@@ -73,7 +73,16 @@ return [
                     'teams' => []
                 ]
             ],
-            'unmirrored_profiles' => []
+            'simple_profiles' => [
+                [
+                    '@type' => 'profile',
+                    'identifier' => 'b46caba3-19ef-4bdf-b5ab-37f925485005',
+                    'alias' => 'hiddenprofile1',
+                    'tags' => [ 'hidden', 'player', 'profile', 'one' ],
+                    'badges' => [],
+                    'unmirrored_badges' => []
+                ]
+            ]
         ]
     ],
     'expected' => [
@@ -103,12 +112,14 @@ return [
                         'identifier' => '94a03a00-8420-4ee2-a4f7-0e0ff1989592',
                         'alias' => 'mockprofile1',
                         'tags' => [ 'mock', 'player', 'profile', 'one' ],
+                        'badges' => []
                     ],
                     [
                         '@type' => 'profile',
                         'identifier' => '6c469af2-f60a-4bd9-b220-822a377f033e',
                         'alias' => 'mockprofile2',
                         'tags' => [],
+                        'badges' => []
                     ]
                 ]
             ]

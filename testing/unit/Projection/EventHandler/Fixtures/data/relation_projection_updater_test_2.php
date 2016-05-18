@@ -50,11 +50,27 @@ return [
                             'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
                             'award' => 'High Score'
                         ]
-                    ],
-                    'unmirrored_badges' => []
+                    ]
                 ]
             ],
-            'unmirrored_profiles' => []
+            'simple_profiles' => [
+                [
+                    '@type' => 'profile',
+                    'identifier' => 'b46caba3-19ef-4bdf-b5ab-37f925485005',
+                    'alias' => 'hiddenprofile1',
+                    'tags' => [ 'hidden', 'player', 'profile', 'one' ],
+                    'teams' => [
+                        [
+                            '@type' => 'team',
+                            'identifier' => '8f5acbea-ad9a-4cd3-86f6-8fd4de2e734a',
+                            'referenced_identifier' =>
+                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+                            'name' => 'Super Clan'
+                        ]
+                    ],
+                    'badges' => []
+                ]
+            ]
         ],
         [
             '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
@@ -99,7 +115,6 @@ return [
                             'award' => 'High Score'
                         ]
                     ],
-                    'unmirrored_badges' => []
                 ],
                 [
                     '@type' => 'profile',
@@ -115,54 +130,69 @@ return [
                             'name' => 'Super Clan'
                         ]
                     ],
-                    'badges' => [],
-                    'unmirrored_badges' => []
+                    'badges' => []
                 ],
             ],
-            'unmirrored_profiles' => []
-        ],
+            'simple_profiles' => []
+        ]
     ],
     'expectations' => [
         [
-        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
-        'identifier' => 'honeybee.fixtures.player-96202e45-1574-49d4-a4f1-33ed2e6d2f57-de_DE-1',
-        'revision' => 3,
-        'uuid' => '96202e45-1574-49d4-a4f1-33ed2e6d2f57',
-        'short_id' => 0,
-        'language' => 'de_DE',
-        'version' => 1,
-        'created_at' => '2016-04-26T10:52:35.349643+00:00',
-        'modified_at' => '2016-04-26T10:52:35.349643+00:00',
-        'workflow_state' => 'edit',
-        'workflow_parameters' => [],
-        'metadata' => [],
-        'name' => 'Mr Bean',
-        'profiles' => [
-            [
-                '@type' => 'profile',
-                'identifier' => '6c469af2-f60a-4bd9-b220-822a377f033e',
-                'alias' => 'mockprofile1',
-                'tags' => [ 'mock', 'profile', 'one' ],
-                'teams' => [
-                    [
-                        '@type' => 'team',
-                        'identifier' => '704856e1-28a3-4069-8055-4ff4fd2f3b83',
-                        'referenced_identifier' =>
-                        'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                        'name' => 'Burst City Rockers'
-                    ]
-                ],
-                'badges' => [
-                    [
-                        '@type' => 'badge',
-                        'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
-                        'award' => 'High Score'
-                    ]
-                ],
-                'unmirrored_badges' => []
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
+            'identifier' => 'honeybee.fixtures.player-96202e45-1574-49d4-a4f1-33ed2e6d2f57-de_DE-1',
+            'revision' => 3,
+            'uuid' => '96202e45-1574-49d4-a4f1-33ed2e6d2f57',
+            'short_id' => 0,
+            'language' => 'de_DE',
+            'version' => 1,
+            'created_at' => '2016-04-26T10:52:35.349643+00:00',
+            'modified_at' => '2016-04-26T10:52:35.349643+00:00',
+            'workflow_state' => 'edit',
+            'workflow_parameters' => [],
+            'metadata' => [],
+            'name' => 'Mr Bean',
+            'profiles' => [
+                [
+                    '@type' => 'profile',
+                    'identifier' => '6c469af2-f60a-4bd9-b220-822a377f033e',
+                    'alias' => 'mockprofile1',
+                    'tags' => [ 'mock', 'profile', 'one' ],
+                    'teams' => [
+                        [
+                            '@type' => 'team',
+                            'identifier' => '704856e1-28a3-4069-8055-4ff4fd2f3b83',
+                            'referenced_identifier' =>
+                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+                            'name' => 'Burst City Rockers'
+                        ]
+                    ],
+                    'badges' => [
+                        [
+                            '@type' => 'badge',
+                            'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
+                            'award' => 'High Score'
+                        ]
+                    ],
+                ]
+            ],
+            'simple_profiles' => [
+                [
+                    '@type' => 'profile',
+                    'identifier' => 'b46caba3-19ef-4bdf-b5ab-37f925485005',
+                    'alias' => 'hiddenprofile1',
+                    'tags' => [ 'hidden', 'player', 'profile', 'one' ],
+                    'teams' => [
+                        [
+                            '@type' => 'team',
+                            'identifier' => '8f5acbea-ad9a-4cd3-86f6-8fd4de2e734a',
+                            'referenced_identifier' =>
+                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+                            'name' => 'Burst City Rockers'
+                        ]
+                    ],
+                    'badges' => []
+                ]
             ]
-        ],
-        'unmirrored_profiles' => []
         ],
         [
             '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
@@ -206,8 +236,7 @@ return [
                             'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
                             'award' => 'High Score'
                         ]
-                    ],
-                    'unmirrored_badges' => []
+                    ]
                 ],
                 [
                     '@type' => 'profile',
@@ -219,15 +248,14 @@ return [
                             '@type' => 'team',
                             'identifier' => '4e17d22b-028a-436f-9adf-06185712cac2',
                             'referenced_identifier' =>
-                            'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
                             'name' => 'Burst City Rockers'
                         ]
                     ],
                     'badges' => [],
-                    'unmirrored_badges' => []
-                ],
+                ]
             ],
-            'unmirrored_profiles' => []
-        ],
+            'simple_profiles' => []
+        ]
     ]
 ];

@@ -19,7 +19,7 @@ return [
                     'referenced_identifier' =>
                         'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1'
                 ],
-                'position' => 0,
+                'position' => 1,
                 'embedded_entity_identifier' => 'ca8a5117-927a-4f94-8b0d-7b0be6196acf',
                 'embedded_entity_type' => 'player',
                 'parent_attribute_name' => 'players',
@@ -44,7 +44,7 @@ return [
         'metadata' => []
     ],
     'aggregate_root' => [
-        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\GameType',
+        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
         'identifier' => 'honeybee.fixtures.game-a7cec777-d932-4bbd-8156-261138d3fe39-de_DE-1',
         'revision' => 3,
         'uuid' => 'a7cec777-d932-4bbd-8156-261138d3fe39',
@@ -64,7 +64,15 @@ return [
                 'attempts' => 1
             ]
         ],
-        'players' => []
+        'players' => [
+            [
+                '@type' => 'player',
+                'identifier' => '99d68357-595e-41f3-9675-b532a8ed968f',
+                'referenced_identifier' => 'honeybee.fixtures.player-c9a1fd68-e6e5-462c-a544-c86f0812cf6c-de_DE-1',
+                'name' => 'Existing Player',
+                'profiles' => []
+            ]
+        ]
     ],
     'references' => [
         'player' => [
@@ -87,20 +95,6 @@ return [
                     'identifier' => '7b446909-9e43-42fb-a043-969463747e2a',
                     'alias' => 'mockprofile1',
                     'tags' => [ 'mock', 'player', 'profile', 'one' ],
-                    'badges' => [
-                        [
-                            '@type' => 'badge',
-                            'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
-                            'award' => 'High Score'
-                        ]
-                    ],
-                    'unmirrored_badges' => [
-                        [
-                            '@type' => 'badge',
-                            'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
-                            'award' => 'Low Score'
-                        ]
-                    ],
                     'teams' => [
                         [
                             '@type' => 'team',
@@ -116,10 +110,17 @@ return [
                                 'honeybee.fixtures.team-5a0862fb-b7bc-7d1a-5212-3ade34acfcea-de_DE-1',
                             'name' => 'Burst City'
                         ]
+                    ],
+                    'badges' => [
+                        [
+                            '@type' => 'badge',
+                            'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
+                            'award' => 'High Score'
+                        ]
                     ]
                 ]
             ],
-            'unmirrored_profiles' => [
+            'simple_profiles' => [
                 [
                     '@type' => 'profile',
                     'identifier' => '94a03a00-8420-4ee2-a4f7-0e0ff1989592',
@@ -155,6 +156,13 @@ return [
         'players' => [
             [
                 '@type' => 'player',
+                'identifier' => '99d68357-595e-41f3-9675-b532a8ed968f',
+                'referenced_identifier' => 'honeybee.fixtures.player-c9a1fd68-e6e5-462c-a544-c86f0812cf6c-de_DE-1',
+                'name' => 'Existing Player',
+                'profiles' => []
+            ],
+            [
+                '@type' => 'player',
                 'identifier' => 'ca8a5117-927a-4f94-8b0d-7b0be6196acf',
                 'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
                 'name' => 'Mock Player',
@@ -164,6 +172,13 @@ return [
                         'identifier' => '7b446909-9e43-42fb-a043-969463747e2a',
                         'alias' => 'mockprofile1',
                         'tags' => [ 'mock', 'player', 'profile', 'one' ],
+                        'badges' => [
+                            [
+                                '@type' => 'badge',
+                                'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
+                                'award' => 'High Score'
+                            ]
+                        ]
                     ]
                 ]
             ]
