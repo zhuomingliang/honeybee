@@ -4,6 +4,6 @@ namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Refere
 
 use Honeybee\Projection\ReferencedEntity;
 
-class Player extends ReferencedEntity
+class Membership extends ReferencedEntity
 {
 }

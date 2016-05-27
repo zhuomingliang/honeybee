@@ -2,11 +2,12 @@
 
 namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Player;
 
-use Trellis\Common\Options;
-use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
-use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
 use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\EntityType;
 use Workflux\StateMachine\StateMachineInterface;
+use Trellis\Common\Options;
+use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
+use Trellis\Runtime\Attribute\GeoPoint\GeoPointAttribute;
+use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
 
 class PlayerType extends EntityType
 {
@@ -21,12 +22,13 @@ class PlayerType extends EntityType
             parent::getDefaultAttributes(),
             [
                 new Text('name', $this, [ 'mandatory' => true ]),
+                new GeoPointAttribute('location', $this, []),
                 new EmbeddedEntityListAttribute(
                     'profiles',
                     $this,
                     [
                         'entity_types' => [
-                            self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType',
+                            self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType'
                         ]
                     ]
                 ),
@@ -35,10 +37,10 @@ class PlayerType extends EntityType
                     $this,
                     [
                         'entity_types' => [
-                            self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType',
+                            self::NAMESPACE_PREFIX . 'Player\\Embed\\ProfileType'
                         ]
                     ]
-                ),
+                )
             ]
         );
     }

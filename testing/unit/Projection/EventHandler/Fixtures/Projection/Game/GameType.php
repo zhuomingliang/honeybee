@@ -2,12 +2,12 @@
 
 namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game;
 
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
+use Workflux\StateMachine\StateMachineInterface;
 use Trellis\Common\Options;
 use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 use Trellis\Runtime\Attribute\EntityReferenceList\EntityReferenceListAttribute;
 use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
-use Workflux\StateMachine\StateMachineInterface;
 
 class GameType extends ProjectionType
 {
@@ -27,7 +27,7 @@ class GameType extends ProjectionType
                     $this,
                     [
                         'entity_types' => [
-                            self::NAMESPACE_PREFIX . 'Game\\Embed\\ChallengeType',
+                            self::NAMESPACE_PREFIX . 'Game\\Embed\\ChallengeType'
                         ]
                     ]
                 ),
@@ -36,7 +36,7 @@ class GameType extends ProjectionType
                     $this,
                     [
                         'entity_types' => [
-                            self::NAMESPACE_PREFIX . 'Game\\Reference\\PlayerType',
+                            self::NAMESPACE_PREFIX . 'Game\\Reference\\PlayerType'
                         ]
                     ]
                 )

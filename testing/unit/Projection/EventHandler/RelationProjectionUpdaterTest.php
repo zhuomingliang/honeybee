@@ -3,23 +3,25 @@
 namespace Honeybee\Tests\Projection\EventHandler;
 
 use Honeybee\Tests\TestCase;
-use Honeybee\Model\Aggregate\AggregateRootTypeMap;
 use Honeybee\Model\Event\EmbeddedEntityEventList;
 use Honeybee\Projection\ProjectionTypeMap;
 use Honeybee\Projection\EventHandler\RelationProjectionUpdater;
+use Honeybee\Projection\ProjectionInterface;
+use Honeybee\Projection\ProjectionUpdatedEvent;
 use Honeybee\Infrastructure\Config\ArrayConfig;
+use Honeybee\Infrastructure\DataAccess\Query\QueryInterface;
 use Honeybee\Infrastructure\DataAccess\Query\QueryServiceMap;
 use Honeybee\Infrastructure\DataAccess\Finder\FinderResult;
 use Honeybee\Infrastructure\DataAccess\Storage\StorageWriterMap;
 use Honeybee\Infrastructure\DataAccess\Storage\Elasticsearch\Projection\ProjectionWriter;
 use Honeybee\Infrastructure\DataAccess\Query\QueryServiceInterface;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Player\PlayerType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Team\TeamType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\GameType as GameProjectionType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\PlayerType as PlayerProjectionType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Team\TeamType as TeamProjectionType;
+use Honeybee\Infrastructure\Event\Bus\EventBus;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\GameType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\PlayerType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Team\TeamType;
 use Workflux\Builder\XmlStateMachineBuilder;
 use Psr\Log\NullLogger;
+use Mockery as M;
 
 class RelationProjectionUpdaterTest extends TestCase
 {
@@ -31,23 +33,14 @@ class RelationProjectionUpdaterTest extends TestCase
     {
         $state_machine = $this->getDefaultStateMachine();
 
-        $player_aggregate_root_type = new PlayerType($state_machine);
-        $team_aggregate_root_type = new TeamType($state_machine);
-        $this->aggregate_root_type_map = new AggregateRootTypeMap(
-            [
-                $player_aggregate_root_type->getPrefix() => $player_aggregate_root_type,
-                $team_aggregate_root_type->getPrefix() => $team_aggregate_root_type
-            ]
-        );
-
-        $game_projection_type = new GameProjectionType($state_machine);
-        $player_projection_type = new PlayerProjectionType($state_machine);
-        $team_projection_type = new TeamProjectionType($state_machine);
+        $game_type = new GameType($state_machine);
+        $player_type = new PlayerType($state_machine);
+        $team_type = new TeamType($state_machine);
         $this->projection_type_map = new ProjectionTypeMap(
             [
-                $game_projection_type->getPrefix() => $game_projection_type,
-                $player_projection_type->getPrefix() => $player_projection_type,
-                $team_projection_type->getPrefix() => $team_projection_type,
+                $game_type->getPrefix() => $game_type,
+                $player_type->getPrefix() => $player_type,
+                $team_type->getPrefix() => $team_type
             ]
         );
     }
@@ -55,54 +48,71 @@ class RelationProjectionUpdaterTest extends TestCase
     /**
      * @dataProvider provideTestEvents
      */
-    public function testHandleEvents(array $event, array $relations, array $expectations)
+    public function testHandleEvents(array $event, array $query, array $projections, array $expectations)
     {
-        //@todo check the invocation count expectation matchers are working
-        $mock_query_service_map = new QueryServiceMap;
-        $mock_storage_writer_map = new StorageWriterMap;
-
         // build projection finder results
-        foreach ($relations as $relation) {
-            $projection_type = $this->projection_type_map->getByEntityImplementor($relation['@type']);
-            $related_projections[] = $projection_type->createEntity($relation);
+        foreach ($projections as $projection) {
+            $projection_type = $this->projection_type_map->getByEntityImplementor($projection['@type']);
+            $projection_type_prefix = $projection_type->getPrefix();
+            $related_projections[] = $projection_type->createEntity($projection);
         }
 
         // prepare mock query responses
-        $projection_type_prefix = $projection_type->getPrefix();
-        $mock_query_service = \Mockery::mock(QueryServiceInterface::CLASS);
+        $mock_query_service = M::mock(QueryServiceInterface::CLASS);
+        $mock_query_service_map = M::mock(QueryServiceMap::CLASS);
+        $mock_finder_result = M::mock(FinderResult::CLASS);
+        $mock_finder_result->shouldReceive('getResults')->once()->withNoArgs()->andReturn($related_projections);
+        $service_name = $projection_type_prefix . '::query_service';
+        $mock_query_service_map->shouldReceive('getItem')->once()->with($service_name)->andReturn($mock_query_service);
         $mock_query_service->shouldReceive('find')
-            ->with(\Mockery::on(
-                function ($query) use ($event) {
-                    $filter_criteria_list = $query->toArray()['filter_criteria_list'][1];
-                    // dump filter list here for debugging
-                    $match = false;
-                    foreach ($filter_criteria_list as $filter_criteria) {
-                        $match = strpos($filter_criteria['attribute_path'], 'referenced_identifier') !== false
-                            && $filter_criteria['comparison']['comparand'] === $event['aggregate_root_identifier'];
-                    }
-                    return $match;
+            ->once()
+            ->with(M::on(
+                function (QueryInterface $search_query) use ($query) {
+                    $this->assertEquals($query, $search_query->toArray());
+                    return true;
                 }
             ))
-            ->times(count($related_projections))
-            ->andReturn(new FinderResult($related_projections));
-        $mock_query_service_map->setItem($projection_type_prefix . '::query_service', $mock_query_service);
+            ->andReturn($mock_finder_result);
 
-        // prepare storage writer expectations
-        $mock_storage_writer = \Mockery::mock(ProjectionWriter::CLASS);
-        foreach ($expectations as $expected) {
-            $mock_storage_writer->shouldReceive('write')
-                ->once()
-                ->with(\Mockery::on(
-                    function ($projection) use ($expected) {
-                        // dump arrays here if required for debugging
-                        return $projection->toArray() === $expected;
-                    }
-                ));
+        // prepare storage writer and event bus expectations
+        $mock_event_bus = M::mock(EventBus::CLASS);
+        $mock_storage_writer = M::mock(ProjectionWriter::CLASS);
+        $mock_storage_writer_map = M::mock(StorageWriterMap::CLASS);
+        if (!empty($expectations) && $expectations !== $projections) {
+            $store_name = $projection_type_prefix . '::projection.standard::view_store::writer';
+            $mock_storage_writer_map->shouldReceive('getItem')
+                ->times(count($expectations))
+                ->with($store_name)
+                ->andReturn($mock_storage_writer);
+
+            foreach ($expectations as $expectation) {
+                $mock_storage_writer->shouldReceive('write')
+                    ->once()
+                    ->with(M::on(
+                        function (ProjectionInterface $projection) use ($expectation) {
+                            $this->assertEquals($expectation, $projection->toArray());
+                            return true;
+                        }
+                    ))
+                    ->andReturnNull();
+
+                $mock_event_bus->shouldReceive('distribute')
+                    ->once()
+                    ->with('honeybee.events.infrastructure', M::on(
+                        function (ProjectionUpdatedEvent $update_event) use ($expectation) {
+                            $this->assertEquals($expectation['identifier'], $update_event->getProjectionIdentifier());
+                            $this->assertEquals($expectation['@type'] . 'Type', $update_event->getProjectionType());
+                            $this->assertEquals($expectation, $update_event->getData());
+                            return true;
+                        }
+                    ))
+                    ->andReturnNull();
+            }
+        } else {
+            $mock_storage_writer_map->shouldNotReceive('getItem');
+            $mock_storage_writer->shouldNotReceive('write');
+            $mock_event_bus->shouldNotReceive('distribute');
         }
-        $mock_storage_writer_map->setItem(
-            $projection_type_prefix . '::projection.standard::view_store::writer',
-            $mock_storage_writer
-        );
 
         // prepare and test subject
         $relation_projection_updater = new RelationProjectionUpdater(
@@ -111,7 +121,7 @@ class RelationProjectionUpdaterTest extends TestCase
             $mock_storage_writer_map,
             $mock_query_service_map,
             $this->projection_type_map,
-            $this->aggregate_root_type_map
+            $mock_event_bus
         );
 
         $event = $this->buildEvent($event);
@@ -132,11 +142,6 @@ class RelationProjectionUpdaterTest extends TestCase
     protected function buildEvent(array $event_state)
     {
         $event_type_class = $event_state['@type'];
-        $embedded_entity_events = new EmbeddedEntityEventList;
-        foreach ($event_state['embedded_entity_events'] as $embedded_event_state) {
-            $embedded_entity_events->push($this->buildEvent($embedded_event_state));
-        }
-        $event_state['embedded_entity_events'] = $embedded_entity_events;
         return new $event_type_class($event_state);
     }
 

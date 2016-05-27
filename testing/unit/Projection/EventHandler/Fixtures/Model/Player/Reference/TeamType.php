@@ -1,9 +1,9 @@
 <?php
 
-namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Reference;
+namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Player\Reference;
 
-use Honeybee\Projection\ReferencedEntityType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
+use Honeybee\Model\Aggregate\ReferencedEntityType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\EntityType;
 use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
@@ -16,12 +16,12 @@ class TeamType extends ReferencedEntityType
         parent::__construct(
             'Team',
             [
-                new Text('name', $this, [ 'mirrored' => true ], $parent_attribute)
+                new Text('name', $this, [], $parent_attribute)
             ],
             new Options(
                 [
-                    'referenced_type' => ProjectionType::NAMESPACE_PREFIX . 'Team\\TeamType',
-                    'identifying_attribute' => 'identifier',
+                    'referenced_type' => EntityType::NAMESPACE_PREFIX . 'Team\\TeamType',
+                    'identifying_attribute' => 'identifier'
                 ]
             ),
             $parent,

@@ -49,10 +49,11 @@ return [
         'iso_date' => '2016-04-28T10:52:37.371793+00:00',
         'metadata' => []
     ],
-    'aggregate_root' => [
-    ],
-    'references' => [
-        'player1' => [
+    'aggregate_root' => [],
+    'parent_node' => [],
+    'query' => [],
+    'projections' => [
+        [
             '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
             'identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
             'revision' => 1,
@@ -66,6 +67,7 @@ return [
             'workflow_parameters' => [],
             'metadata' => [],
             'name' => 'Player 1 No Profiles',
+            'location' => [ 'lon' => 1.2, 'lat' => 2.1 ],
             'profiles' => [],
             'simple_profiles' => [
                 [
@@ -85,7 +87,7 @@ return [
                 ]
             ]
         ],
-        'player2' => [
+        [
             '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
             'identifier' => 'honeybee.fixtures.player-48fde7c4-7889-42db-8522-6106bf85d58a-de_DE-1',
             'revision' => 1,
@@ -99,39 +101,46 @@ return [
             'workflow_parameters' => [],
             'metadata' => [],
             'name' => 'Player 2 No Profiles',
+            'location' => [ 'lon' => 2.313, 'lat' => 2.09 ],
             'profiles' => [],
             'simple_profiles' => []
         ]
     ],
-    'expected' => [
-        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
-        'identifier' => 'honeybee.fixtures.game-49c5a3b7-8127-4169-8676-a9ebb5229142-de_DE-1',
-        'revision' => 1,
-        'uuid' => '49c5a3b7-8127-4169-8676-a9ebb5229142',
-        'short_id' => 0,
-        'language' => 'de_DE',
-        'version' => 1,
-        'created_at' => '2016-04-28T10:52:37.371793+00:00',
-        'modified_at' => '2016-04-28T10:52:37.371793+00:00',
-        'workflow_state' => 'edit',
-        'workflow_parameters' => [],
-        'metadata' => [],
-        'title' => 'Dan Dare',
-        'challenges' => [],
-        'players' => [
-            [
-                '@type' => 'player',
-                'identifier' => 'ca8a5117-927a-4f94-8b0d-7b0be6196acf',
-                'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                'name' => 'Player 1 No Profiles',
-                'profiles' => []
-            ],
-            [
-                '@type' => 'player',
-                'identifier' => 'd058229c-ef88-4897-92a8-df155e863a2f',
-                'referenced_identifier' => 'honeybee.fixtures.player-48fde7c4-7889-42db-8522-6106bf85d58a-de_DE-1',
-                'name' => 'Player 2 No Profiles',
-                'profiles' => []
+    'expectations' => [
+        [
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
+            'identifier' => 'honeybee.fixtures.game-49c5a3b7-8127-4169-8676-a9ebb5229142-de_DE-1',
+            'revision' => 1,
+            'uuid' => '49c5a3b7-8127-4169-8676-a9ebb5229142',
+            'short_id' => 0,
+            'language' => 'de_DE',
+            'version' => 1,
+            'created_at' => '2016-04-28T10:52:37.371793+00:00',
+            'modified_at' => '2016-04-28T10:52:37.371793+00:00',
+            'workflow_state' => 'edit',
+            'workflow_parameters' => [],
+            'metadata' => [],
+            'title' => 'Dan Dare',
+            'challenges' => [],
+            'players' => [
+                [
+                    '@type' => 'player',
+                    'identifier' => 'ca8a5117-927a-4f94-8b0d-7b0be6196acf',
+                    'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+                    'tagline' => '',
+                    'name' => 'Player 1 No Profiles',
+                    'area' => [ 'lon' => 1.2, 'lat' => 2.1 ],
+                    'profiles' => []
+                ],
+                [
+                    '@type' => 'player',
+                    'identifier' => 'd058229c-ef88-4897-92a8-df155e863a2f',
+                    'referenced_identifier' => 'honeybee.fixtures.player-48fde7c4-7889-42db-8522-6106bf85d58a-de_DE-1',
+                    'tagline' => '',
+                    'name' => 'Player 2 No Profiles',
+                    'area' => [ 'lon' => 2.313, 'lat' => 2.09 ],
+                    'profiles' => []
+                ]
             ]
         ]
     ]

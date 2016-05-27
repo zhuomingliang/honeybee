@@ -22,25 +22,27 @@ return [
         'iso_date' => '2016-04-28T10:52:37.371793+00:00',
         'metadata' => []
     ],
-    'aggregate_root' => [
-    ],
-    'references' => [
-    ],
-    'expected' => [
-        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
-        'identifier' => 'honeybee.fixtures.game-49c5a3b7-8127-4169-8676-a9ebb5229142-de_DE-1',
-        'revision' => 1,
-        'uuid' => '49c5a3b7-8127-4169-8676-a9ebb5229142',
-        'short_id' => 0,
-        'language' => 'de_DE',
-        'version' => 1,
-        'created_at' => '2016-04-28T10:52:37.371793+00:00',
-        'modified_at' => '2016-04-28T10:52:37.371793+00:00',
-        'workflow_state' => 'edit',
-        'workflow_parameters' => [],
-        'metadata' => [],
-        'title' => 'Quake 9',
-        'challenges' => [],
-        'players' => []
+    'aggregate_root' => [],
+    'parent_node' => [],
+    'query' => [],
+    'projections' => [],
+    'expectations' => [
+        [
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
+            'identifier' => 'honeybee.fixtures.game-49c5a3b7-8127-4169-8676-a9ebb5229142-de_DE-1',
+            'revision' => 1,
+            'uuid' => '49c5a3b7-8127-4169-8676-a9ebb5229142',
+            'short_id' => 0,
+            'language' => 'de_DE',
+            'version' => 1,
+            'created_at' => '2016-04-28T10:52:37.371793+00:00',
+            'modified_at' => '2016-04-28T10:52:37.371793+00:00',
+            'workflow_state' => 'edit',
+            'workflow_parameters' => [],
+            'metadata' => [],
+            'title' => 'Quake 9',
+            'challenges' => [],
+            'players' => []
+        ]
     ]
 ];

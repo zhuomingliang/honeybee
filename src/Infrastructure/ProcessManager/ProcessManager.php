@@ -47,14 +47,14 @@ class ProcessManager implements ProcessManagerInterface
 
     public function hasCompleted(ProcessStateInterface $process_state)
     {
-        $process = $this->process_map->getByName($process_state->getProcessName());
+        $process = $this->process_map->getItem($process_state->getProcessName());
 
         return $process->hasFinished($process_state);
     }
 
     public function beginProcess(ProcessStateInterface $process_state, EventInterface $event = null)
     {
-        $process = $this->process_map->getByName($process_state->getProcessName());
+        $process = $this->process_map->getItem($process_state->getProcessName());
         if (!$process->hasStarted($process_state)) {
             $this->runProcess($process_state, $event);
         } else {
@@ -78,7 +78,7 @@ class ProcessManager implements ProcessManagerInterface
 
     protected function runProcess(ProcessStateInterface $process_state, EventInterface $event = null)
     {
-        $process = $this->process_map->getByName($process_state->getProcessName());
+        $process = $this->process_map->getItem($process_state->getProcessName());
         if (!$process->hasFinished($process_state)) {
             $commands = $process->proceed($process_state, $event);
             $this->persistProcessState($process_state);

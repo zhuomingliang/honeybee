@@ -17,7 +17,7 @@ class BadgeType extends EmbeddedEntityType
             [
                 new Text('award', $this, [], $parent_attribute)
             ],
-            new Options([]),
+            new Options,
             $parent,
             $parent_attribute
         );

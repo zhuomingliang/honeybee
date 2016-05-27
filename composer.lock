@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5f5d843b130126c5d58bd276fe585b21",
-    "content-hash": "2e0b9ddceafa658204b9ec37525f945b",
+    "hash": "4d8378f3c2a315dcad044fdbf517e083",
+    "content-hash": "8f30400ad74ffab306f12c204e3d119f",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -476,12 +476,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/honeybee/trellis.git",
-                "reference": "e70784fd898dcbbf613087705e32dcf617a46992"
+                "reference": "e427cc14d7cfa7a06950e95a2fd4f2a65b6a6b1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/honeybee/trellis/zipball/e70784fd898dcbbf613087705e32dcf617a46992",
-                "reference": "e70784fd898dcbbf613087705e32dcf617a46992",
+                "url": "https://api.github.com/repos/honeybee/trellis/zipball/e427cc14d7cfa7a06950e95a2fd4f2a65b6a6b1e",
+                "reference": "e427cc14d7cfa7a06950e95a2fd4f2a65b6a6b1e",
                 "shasum": ""
             },
             "require": {
@@ -537,7 +537,7 @@
                 "entity",
                 "validation"
             ],
-            "time": "2016-05-18 15:00:50"
+            "time": "2016-05-27 16:02:54"
         },
         {
             "name": "league/flysystem",
@@ -1136,12 +1136,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/shrink0r/monatic.git",
-                "reference": "d32ce4114a195f80bc3ac91c496facad4f3e2ee5"
+                "reference": "7ef7acb6f08489e842cc9caf0c721b3714d93e97"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shrink0r/monatic/zipball/d32ce4114a195f80bc3ac91c496facad4f3e2ee5",
-                "reference": "d32ce4114a195f80bc3ac91c496facad4f3e2ee5",
+                "url": "https://api.github.com/repos/shrink0r/monatic/zipball/7ef7acb6f08489e842cc9caf0c721b3714d93e97",
+                "reference": "7ef7acb6f08489e842cc9caf0c721b3714d93e97",
                 "shasum": ""
             },
             "require": {
@@ -1171,7 +1171,7 @@
                     "email": "schmittrink@gmail.com"
                 }
             ],
-            "time": "2015-10-23 13:21:45"
+            "time": "2016-05-20 13:40:41"
         },
         {
             "name": "shrink0r/workflux",
@@ -1732,19 +1732,20 @@
     "packages-dev": [
         {
             "name": "blackfire/php-sdk",
-            "version": "v1.5.13",
+            "version": "v1.5.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/blackfireio/php-sdk.git",
-                "reference": "6e1bfe4d77f8d1a8a18315eef5f57e9211ba4729"
+                "reference": "efb2a0403a8b9bbbc4499020236af231094d3bc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/blackfireio/php-sdk/zipball/6e1bfe4d77f8d1a8a18315eef5f57e9211ba4729",
-                "reference": "6e1bfe4d77f8d1a8a18315eef5f57e9211ba4729",
+                "url": "https://api.github.com/repos/blackfireio/php-sdk/zipball/efb2a0403a8b9bbbc4499020236af231094d3bc2",
+                "reference": "efb2a0403a8b9bbbc4499020236af231094d3bc2",
                 "shasum": ""
             },
             "require": {
+                "composer/ca-bundle": "^1.0",
                 "php": ">=5.2.0"
             },
             "suggest": {
@@ -1782,7 +1783,62 @@
                 "uprofiler",
                 "xhprof"
             ],
-            "time": "2016-05-16 10:16:03"
+            "time": "2016-05-18 16:16:33"
+        },
+        {
+            "name": "composer/ca-bundle",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/ca-bundle.git",
+                "reference": "a2995e5fe351055f2c7630166af12ce8fd03edfc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/a2995e5fe351055f2c7630166af12ce8fd03edfc",
+                "reference": "a2995e5fe351055f2c7630166af12ce8fd03edfc",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.2 || ^7.0"
+            },
+            "require-dev": {
+                "symfony/process": "^2.5 || ^3.0"
+            },
+            "suggest": {
+                "symfony/process": "This is necessary to reliably check whether openssl_x509_parse is vulnerable on older php versions, but can be ignored on PHP 5.5.6+"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\CaBundle\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Lets you find a path to the system CA bundle, and includes a fallback to the Mozilla CA bundle.",
+            "keywords": [
+                "cabundle",
+                "cacert",
+                "certificate",
+                "ssl",
+                "tls"
+            ],
+            "time": "2016-04-13 10:13:24"
         },
         {
             "name": "doctrine/instantiator",
@@ -1840,20 +1896,20 @@
         },
         {
             "name": "hamcrest/hamcrest-php",
-            "version": "v1.2.2",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hamcrest/hamcrest-php.git",
-                "reference": "b37020aa976fa52d3de9aa904aa2522dc518f79c"
+                "reference": "776503d3a8e85d4f9a1148614f95b7a608b046ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/b37020aa976fa52d3de9aa904aa2522dc518f79c",
-                "reference": "b37020aa976fa52d3de9aa904aa2522dc518f79c",
+                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/776503d3a8e85d4f9a1148614f95b7a608b046ad",
+                "reference": "776503d3a8e85d4f9a1148614f95b7a608b046ad",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2"
+                "php": "^5.3|^7.0"
             },
             "replace": {
                 "cordoval/hamcrest-php": "*",
@@ -1862,15 +1918,18 @@
             },
             "require-dev": {
                 "phpunit/php-file-iterator": "1.3.3",
-                "satooshi/php-coveralls": "dev-master"
+                "phpunit/phpunit": "~4.0",
+                "satooshi/php-coveralls": "^1.0"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
             "autoload": {
                 "classmap": [
                     "hamcrest"
-                ],
-                "files": [
-                    "hamcrest/Hamcrest.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1881,26 +1940,26 @@
             "keywords": [
                 "test"
             ],
-            "time": "2015-05-11 14:41:42"
+            "time": "2016-01-20 08:20:44"
         },
         {
             "name": "mockery/mockery",
-            "version": "0.9.4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padraic/mockery.git",
-                "reference": "70bba85e4aabc9449626651f48b9018ede04f86b"
+                "reference": "ad31ff997d983e0d5d60ac80cfcedcbb4e6c4461"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/mockery/zipball/70bba85e4aabc9449626651f48b9018ede04f86b",
-                "reference": "70bba85e4aabc9449626651f48b9018ede04f86b",
+                "url": "https://api.github.com/repos/padraic/mockery/zipball/ad31ff997d983e0d5d60ac80cfcedcbb4e6c4461",
+                "reference": "ad31ff997d983e0d5d60ac80cfcedcbb4e6c4461",
                 "shasum": ""
             },
             "require": {
-                "hamcrest/hamcrest-php": "~1.1",
+                "hamcrest/hamcrest-php": "^2.0@dev",
                 "lib-pcre": ">=7.0",
-                "php": ">=5.3.2"
+                "php": ">=5.4.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "~4.0"
@@ -1908,7 +1967,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.9.x-dev"
+                    "dev-master": "1.0.x-dev"
                 }
             },
             "autoload": {
@@ -1946,7 +2005,7 @@
                 "test double",
                 "testing"
             ],
-            "time": "2015-04-02 19:54:00"
+            "time": "2016-05-03 10:17:25"
         },
         {
             "name": "myclabs/deep-copy",
@@ -2253,16 +2312,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "3.3.1",
+            "version": "3.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "2431befdd451fac43fbcde94d1a92fb3b8b68f86"
+                "reference": "44cd8e3930e431658d1a5de7d282d5cb37837fd5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/2431befdd451fac43fbcde94d1a92fb3b8b68f86",
-                "reference": "2431befdd451fac43fbcde94d1a92fb3b8b68f86",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/44cd8e3930e431658d1a5de7d282d5cb37837fd5",
+                "reference": "44cd8e3930e431658d1a5de7d282d5cb37837fd5",
                 "shasum": ""
             },
             "require": {
@@ -2312,7 +2371,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-04-08 08:14:53"
+            "time": "2016-05-27 16:24:29"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3788,7 +3847,8 @@
     "stability-flags": {
         "honeybee/trellis": 20,
         "shrink0r/workflux": 20,
-        "shrink0r/monatic": 20
+        "shrink0r/monatic": 20,
+        "mockery/mockery": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

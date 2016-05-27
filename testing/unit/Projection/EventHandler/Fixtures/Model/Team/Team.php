@@ -6,8 +6,4 @@ use Honeybee\Model\Aggregate\AggregateRoot;
 
 class Team extends AggregateRoot
 {
-    public function getName()
-    {
-        return $this->getValue('name');
-    }
 }

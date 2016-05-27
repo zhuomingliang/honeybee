@@ -34,23 +34,26 @@ return [
         'challenges' => [],
         'players' => []
     ],
-    'references' => [
-    ],
-    'expected' => [
-        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
-        'identifier' => 'honeybee.fixtures.game-a7cec777-d932-4bbd-8156-261138d3fe39-de_DE-1',
-        'revision' => 3,
-        'uuid' => 'a7cec777-d932-4bbd-8156-261138d3fe39',
-        'short_id' => 0,
-        'language' => 'de_DE',
-        'version' => 1,
-        'created_at' => '2016-04-28T10:53:53.530472+00:00',
-        'modified_at' => '2016-04-28T10:53:53.530472+00:00',
-        'workflow_state' => 'edit',
-        'workflow_parameters' => [],
-        'metadata' => [],
-        'title' => 'Doom 3',
-        'challenges' => [],
-        'players' => []
+    'parent_node' => [],
+    'query' => [],
+    'projections' => [],
+    'expectations' => [
+        [
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
+            'identifier' => 'honeybee.fixtures.game-a7cec777-d932-4bbd-8156-261138d3fe39-de_DE-1',
+            'revision' => 3,
+            'uuid' => 'a7cec777-d932-4bbd-8156-261138d3fe39',
+            'short_id' => 0,
+            'language' => 'de_DE',
+            'version' => 1,
+            'created_at' => '2016-04-28T10:53:53.530472+00:00',
+            'modified_at' => '2016-04-28T10:53:53.530472+00:00',
+            'workflow_state' => 'edit',
+            'workflow_parameters' => [],
+            'metadata' => [],
+            'title' => 'Doom 3',
+            'challenges' => [],
+            'players' => []
+        ]
     ]
 ];

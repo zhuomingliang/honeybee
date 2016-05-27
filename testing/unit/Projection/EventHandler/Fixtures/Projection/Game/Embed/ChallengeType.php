@@ -15,9 +15,9 @@ class ChallengeType extends EntityType
         parent::__construct(
             'Challenge',
             [
-                new IntegerAttribute('attempts', $this, [], $parent_attribute),
+                new IntegerAttribute('attempts', $this, [], $parent_attribute)
             ],
-            new Options([]),
+            new Options,
             $parent,
             $parent_attribute
         );

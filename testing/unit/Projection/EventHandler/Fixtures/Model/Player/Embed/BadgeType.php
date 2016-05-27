@@ -15,9 +15,9 @@ class BadgeType extends EmbeddedEntityType
         parent::__construct(
             'Badge',
             [
-                new Text('award', $this, [], $parent_attribute),
+                new Text('award', $this, [], $parent_attribute)
             ],
-            new Options([]),
+            new Options,
             $parent,
             $parent_attribute
         );

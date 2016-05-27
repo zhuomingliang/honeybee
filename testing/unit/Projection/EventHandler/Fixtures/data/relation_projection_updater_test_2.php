@@ -2,52 +2,36 @@
 
 return [
     'event' => [
-        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Task\TeamModifiedEvent',
-        'data' => [
-            'name' => 'Burst City Rockers'
-        ],
-        'aggregate_root_identifier' => 'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-        'aggregate_root_type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Team\TeamType',
-        'embedded_entity_events' => [],
-        'seq_number' => 5,
+        '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Task\MockProjectionUpdatedEvent',
         'uuid' => '44c4597c-f463-4916-a330-2db87ef36547',
-        'iso_date' => '2016-05-28T10:52:37.371793+00:00',
-        'metadata' => []
-    ],
-    'relations' => [
-        [
+        'projection_type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\PlayerType',
+        'projection_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+        'data' => [
             '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
-            'identifier' => 'honeybee.fixtures.player-96202e45-1574-49d4-a4f1-33ed2e6d2f57-de_DE-1',
-            'revision' => 3,
-            'uuid' => '96202e45-1574-49d4-a4f1-33ed2e6d2f57',
+            'identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+            'revision' => 5,
+            'uuid' => 'a726301d-dbae-4fb6-91e9-a19188a17e71',
             'short_id' => 0,
             'language' => 'de_DE',
             'version' => 1,
-            'created_at' => '2016-04-26T10:52:35.349643+00:00',
-            'modified_at' => '2016-04-26T10:52:35.349643+00:00',
+            'created_at' => '2016-05-27T10:52:37.371793+00:00',
+            'modified_at' => '2016-05-27T10:52:37.371793+00:00',
             'workflow_state' => 'edit',
             'workflow_parameters' => [],
             'metadata' => [],
-            'name' => 'Mr Bean',
+            'name' => 'Anatoly Karpov',
+            'location' => [ 'lon' => 1.2, 'lat' => 2.1 ],
             'profiles' => [
                 [
                     '@type' => 'profile',
-                    'identifier' => '6c469af2-f60a-4bd9-b220-822a377f033e',
+                    'identifier' => '94a03a00-8420-4ee2-a4f7-0e0ff1989592',
                     'alias' => 'mockprofile1',
                     'tags' => [ 'mock', 'profile', 'one' ],
-                    'teams' => [
-                        [
-                            '@type' => 'team',
-                            'identifier' => '704856e1-28a3-4069-8055-4ff4fd2f3b83',
-                            'referenced_identifier' =>
-                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                            'name' => 'Super Clan'
-                        ]
-                    ],
+                    'teams' => [],
                     'badges' => [
                         [
                             '@type' => 'badge',
-                            'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
+                            'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
                             'award' => 'High Score'
                         ]
                     ]
@@ -56,206 +40,144 @@ return [
             'simple_profiles' => [
                 [
                     '@type' => 'profile',
-                    'identifier' => 'b46caba3-19ef-4bdf-b5ab-37f925485005',
-                    'alias' => 'hiddenprofile1',
-                    'tags' => [ 'hidden', 'player', 'profile', 'one' ],
-                    'teams' => [
-                        [
-                            '@type' => 'team',
-                            'identifier' => '8f5acbea-ad9a-4cd3-86f6-8fd4de2e734a',
-                            'referenced_identifier' =>
-                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                            'name' => 'Super Clan'
-                        ]
-                    ],
+                    'identifier' => '94a03a00-8420-4ee2-a4f7-0e0ff1989592',
+                    'alias' => 'this thing changed',
+                    'tags' => [ 'changed', 'profile', 'one' ],
+                    'teams' => [],
                     'badges' => []
                 ]
             ]
         ],
+        'iso_date' => '2016-05-28T10:52:37.371793+00:00',
+        'metadata' => []
+    ],
+    'query' => [
+        '@type' => 'Honeybee\Infrastructure\DataAccess\Query\Query',
+        'search_criteria_list' => [],
+        'filter_criteria_list' => [
+            [
+                '@type' => 'Honeybee\Infrastructure\DataAccess\Query\AttributeCriteria',
+                'attribute_path' => 'identifier',
+                'comparison' => [
+                    '@type' => 'Honeybee\Infrastructure\DataAccess\Query\Comparison\Equals',
+                    'comparator' => 'eq',
+                    'comparand' => '!honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1'
+                ]
+            ],
+            [
+                [
+                    '@type' => 'Honeybee\Infrastructure\DataAccess\Query\AttributeCriteria',
+                    'attribute_path' => 'players.referenced_identifier',
+                    'comparison' => [
+                        '@type' => 'Honeybee\Infrastructure\DataAccess\Query\Comparison\Equals',
+                        'comparator' => 'eq',
+                        'comparand' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1'
+                    ]
+                ]
+            ]
+        ],
+        'sort_criteria_list' => [],
+        'offset' => 0,
+        'limit' => 10000
+    ],
+    'projections' => [
         [
-            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
-            'identifier' => 'honeybee.fixtures.player-c9a1fd68-e6e5-462c-a544-c86f0812cf6c-de_DE-1',
-            'revision' => 5,
-            'uuid' => 'c9a1fd68-e6e5-462c-a544-c86f0812cf6c',
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
+            'identifier' => 'honeybee.fixtures.game-49c5a3b7-8127-4169-8676-a9ebb5229142-de_DE-1',
+            'revision' => 3,
+            'uuid' => '49c5a3b7-8127-4169-8676-a9ebb5229142',
             'short_id' => 0,
             'language' => 'de_DE',
             'version' => 1,
-            'created_at' => '2016-04-25T10:52:35.349643+00:00',
-            'modified_at' => '2016-04-25T10:52:35.349643+00:00',
+            'created_at' => '2016-04-28T10:52:35.349643+00:00',
+            'modified_at' => '2016-04-28T10:52:35.349643+00:00',
             'workflow_state' => 'edit',
             'workflow_parameters' => [],
             'metadata' => [],
-            'name' => 'Idiot Portal',
-            'profiles' => [
+            'title' => 'Doom 4',
+            'challenges' => [
                 [
-                    '@type' => 'profile',
-                    'identifier' => '193bb73b-368e-4145-b322-4a6649cebb55',
-                    'alias' => 'mockprofile1',
-                    'tags' => [ 'mock', 'profile', 'one' ],
-                    'teams' => [
-                        [
-                            '@type' => 'team',
-                            'identifier' => '28347562-927b-449d-a585-a80cf94f730b',
-                            'referenced_identifier' =>
-                                'honeybee.fixtures.team-349d6781-205f-42b7-932f-43b647ac2468-de_DE-1',
-                            'name' => 'Carnivorous Vegans'
-                        ],
-                        [
-                            '@type' => 'team',
-                            'identifier' => '96202e45-1574-49d4-a4f1-33ed2e6d2f57',
-                            'referenced_identifier' =>
-                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                            'name' => 'Super Clan'
-                        ]
-                    ],
-                    'badges' => [
-                        [
-                            '@type' => 'badge',
-                            'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
-                            'award' => 'High Score'
-                        ]
-                    ],
-                ],
-                [
-                    '@type' => 'profile',
-                    'identifier' => '349d6781-205f-42b7-932f-43b647ac2468',
-                    'alias' => 'mockprofile2',
-                    'tags' => [ 'mock', 'profile', 'two' ],
-                    'teams' => [
-                        [
-                            '@type' => 'team',
-                            'identifier' => '4e17d22b-028a-436f-9adf-06185712cac2',
-                            'referenced_identifier' =>
-                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                            'name' => 'Super Clan'
-                        ]
-                    ],
-                    'badges' => []
-                ],
+                    '@type' => 'challenge',
+                    'identifier' => '5f337a59-44bd-4ad4-9b53-7512a231f0b3',
+                    'attempts' => 5
+                ]
             ],
-            'simple_profiles' => []
+            'players' => [
+                [
+                    '@type' => 'player',
+                    'identifier' => '95c5ff31-8eca-41d5-95a0-0eb4ac35904b',
+                    'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+                    'name' => 'Anatoly Karpov',
+                    'area' => [ 'lon' => 1.2, 'lat' => 2.1 ],
+                    'profiles' => [
+                        [
+                            '@type' => 'profile',
+                            'identifier' => '94a03a00-8420-4ee2-a4f7-0e0ff1989592',
+                            'alias' => 'mockprofile1',
+                            'tags' => [ 'mock', 'profile', 'one' ],
+                            'nickname' => 'Barefoot Gen',
+                            'badges' => [
+                                [
+                                    '@type' => 'badge',
+                                    'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
+                                    'award' => 'High Score'
+                                ]
+                            ],
+                            'memberships' => []
+                        ]
+                    ]
+                ]
+            ]
         ]
     ],
     'expectations' => [
         [
-            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
-            'identifier' => 'honeybee.fixtures.player-96202e45-1574-49d4-a4f1-33ed2e6d2f57-de_DE-1',
+            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\Game',
+            'identifier' => 'honeybee.fixtures.game-49c5a3b7-8127-4169-8676-a9ebb5229142-de_DE-1',
             'revision' => 3,
-            'uuid' => '96202e45-1574-49d4-a4f1-33ed2e6d2f57',
+            'uuid' => '49c5a3b7-8127-4169-8676-a9ebb5229142',
             'short_id' => 0,
             'language' => 'de_DE',
             'version' => 1,
-            'created_at' => '2016-04-26T10:52:35.349643+00:00',
-            'modified_at' => '2016-04-26T10:52:35.349643+00:00',
+            'created_at' => '2016-04-28T10:52:35.349643+00:00',
+            'modified_at' => '2016-04-28T10:52:35.349643+00:00',
             'workflow_state' => 'edit',
             'workflow_parameters' => [],
             'metadata' => [],
-            'name' => 'Mr Bean',
-            'profiles' => [
+            'title' => 'Doom 4',
+            'challenges' => [
                 [
-                    '@type' => 'profile',
-                    'identifier' => '6c469af2-f60a-4bd9-b220-822a377f033e',
-                    'alias' => 'mockprofile1',
-                    'tags' => [ 'mock', 'profile', 'one' ],
-                    'teams' => [
-                        [
-                            '@type' => 'team',
-                            'identifier' => '704856e1-28a3-4069-8055-4ff4fd2f3b83',
-                            'referenced_identifier' =>
-                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                            'name' => 'Burst City Rockers'
-                        ]
-                    ],
-                    'badges' => [
-                        [
-                            '@type' => 'badge',
-                            'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
-                            'award' => 'High Score'
-                        ]
-                    ],
+                    '@type' => 'challenge',
+                    'identifier' => '5f337a59-44bd-4ad4-9b53-7512a231f0b3',
+                    'attempts' => 5
                 ]
             ],
-            'simple_profiles' => [
+            'players' => [
                 [
-                    '@type' => 'profile',
-                    'identifier' => 'b46caba3-19ef-4bdf-b5ab-37f925485005',
-                    'alias' => 'hiddenprofile1',
-                    'tags' => [ 'hidden', 'player', 'profile', 'one' ],
-                    'teams' => [
+                    '@type' => 'player',
+                    'identifier' => '95c5ff31-8eca-41d5-95a0-0eb4ac35904b',
+                    'referenced_identifier' => 'honeybee.fixtures.player-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
+                    'name' => 'Anatoly Karpov',
+                    'area' => [ 'lon' => 1.2, 'lat' => 2.1 ],
+                    'profiles' => [
                         [
-                            '@type' => 'team',
-                            'identifier' => '8f5acbea-ad9a-4cd3-86f6-8fd4de2e734a',
-                            'referenced_identifier' =>
-                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                            'name' => 'Burst City Rockers'
-                        ]
-                    ],
-                    'badges' => []
-                ]
-            ]
-        ],
-        [
-            '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
-            'identifier' => 'honeybee.fixtures.player-c9a1fd68-e6e5-462c-a544-c86f0812cf6c-de_DE-1',
-            'revision' => 5,
-            'uuid' => 'c9a1fd68-e6e5-462c-a544-c86f0812cf6c',
-            'short_id' => 0,
-            'language' => 'de_DE',
-            'version' => 1,
-            'created_at' => '2016-04-25T10:52:35.349643+00:00',
-            'modified_at' => '2016-04-25T10:52:35.349643+00:00',
-            'workflow_state' => 'edit',
-            'workflow_parameters' => [],
-            'metadata' => [],
-            'name' => 'Idiot Portal',
-            'profiles' => [
-                [
-                    '@type' => 'profile',
-                    'identifier' => '193bb73b-368e-4145-b322-4a6649cebb55',
-                    'alias' => 'mockprofile1',
-                    'tags' => [ 'mock', 'profile', 'one' ],
-                    'teams' => [
-                        [
-                            '@type' => 'team',
-                            'identifier' => '28347562-927b-449d-a585-a80cf94f730b',
-                            'referenced_identifier' =>
-                            'honeybee.fixtures.team-349d6781-205f-42b7-932f-43b647ac2468-de_DE-1',
-                            'name' => 'Carnivorous Vegans'
-                        ],
-                        [
-                            '@type' => 'team',
-                            'identifier' => '96202e45-1574-49d4-a4f1-33ed2e6d2f57',
-                            'referenced_identifier' =>
-                            'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                            'name' => 'Burst City Rockers'
-                        ]
-                    ],
-                    'badges' => [
-                        [
-                            '@type' => 'badge',
-                            'identifier' => '30efa6d8-792b-4fc8-95af-6fb2a048bcac',
-                            'award' => 'High Score'
+                            '@type' => 'profile',
+                            'identifier' => '94a03a00-8420-4ee2-a4f7-0e0ff1989592',
+                            'alias' => 'mockprofile1',
+                            'tags' => [ 'mock', 'profile', 'one' ],
+                            'nickname' => 'Barefoot Gen',
+                            'badges' => [
+                                [
+                                    '@type' => 'badge',
+                                    'identifier' => '3c642c81-dc8b-485c-9b63-3eaade13c7de',
+                                    'award' => 'High Score'
+                                ]
+                            ],
+                            'memberships' => []
                         ]
                     ]
-                ],
-                [
-                    '@type' => 'profile',
-                    'identifier' => '349d6781-205f-42b7-932f-43b647ac2468',
-                    'alias' => 'mockprofile2',
-                    'tags' => [ 'mock', 'profile', 'two' ],
-                    'teams' => [
-                        [
-                            '@type' => 'team',
-                            'identifier' => '4e17d22b-028a-436f-9adf-06185712cac2',
-                            'referenced_identifier' =>
-                                'honeybee.fixtures.team-a726301d-dbae-4fb6-91e9-a19188a17e71-de_DE-1',
-                            'name' => 'Burst City Rockers'
-                        ]
-                    ],
-                    'badges' => [],
                 ]
-            ],
-            'simple_profiles' => []
+            ]
         ]
     ]
 ];

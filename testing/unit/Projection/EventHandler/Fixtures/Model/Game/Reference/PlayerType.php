@@ -8,6 +8,7 @@ use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
 use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
+use Trellis\Runtime\Attribute\GeoPoint\GeoPointAttribute;
 use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
 
 class PlayerType extends ReferencedEntityType
@@ -18,22 +19,14 @@ class PlayerType extends ReferencedEntityType
             'Player',
             [
                 new Text('name', $this, [], $parent_attribute),
+                new Text('tagline', $this, [], $parent_attribute),
+                new GeoPointAttribute('area', $this, [], $parent_attribute),
                 new EmbeddedEntityListAttribute(
                     'profiles',
                     $this,
                     [
                         'entity_types' => [
-                            EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
-                        ]
-                    ],
-                    $parent_attribute
-                ),
-                new EmbeddedEntityListAttribute(
-                    'simple_profiles',
-                    $this,
-                    [
-                        'entity_types' => [
-                            EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType',
+                            EntityType::NAMESPACE_PREFIX . 'Game\\Embed\\ProfileType'
                         ]
                     ],
                     $parent_attribute
@@ -42,7 +35,7 @@ class PlayerType extends ReferencedEntityType
             new Options(
                 [
                     'referenced_type' => EntityType::NAMESPACE_PREFIX . 'Player\\PlayerType',
-                    'identifying_attribute' => 'identifier',
+                    'identifying_attribute' => 'identifier'
                 ]
             ),
             $parent,

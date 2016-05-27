@@ -10,6 +10,7 @@ use Trellis\Runtime\Attribute\AttributeInterface;
 use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 use Trellis\Runtime\Attribute\TextList\TextListAttribute;
 use Trellis\Runtime\Attribute\EmbeddedEntityList\EmbeddedEntityListAttribute;
+use Trellis\Runtime\Attribute\EntityReferenceList\EntityReferenceListAttribute;
 
 class ProfileType extends EmbeddedEntityType
 {
@@ -20,28 +21,28 @@ class ProfileType extends EmbeddedEntityType
             [
                 new Text('alias', $this, [], $parent_attribute),
                 new TextListAttribute('tags', $this, [], $parent_attribute),
+                new EntityReferenceListAttribute(
+                    'teams',
+                    $this,
+                    [
+                        'entity_types' => [
+                            EntityType::NAMESPACE_PREFIX . 'Player\\Reference\\TeamType'
+                        ]
+                    ],
+                    $parent_attribute
+                ),
                 new EmbeddedEntityListAttribute(
                     'badges',
                     $this,
                     [
                         'entity_types' => [
-                            EntityType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType',
+                            EntityType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType'
                         ]
                     ],
                     $parent_attribute
-                ),
-                new EmbeddedEntityListAttribute(
-                    'unmirrored_badges',
-                    $this,
-                    [
-                        'entity_types' => [
-                            EntityType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType',
-                        ]
-                    ],
-                    $parent_attribute
-                ),
+                )
             ],
-            new Options([]),
+            new Options,
             $parent,
             $parent_attribute
         );

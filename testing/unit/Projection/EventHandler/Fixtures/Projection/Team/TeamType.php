@@ -2,16 +2,16 @@
 
 namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Team;
 
-use Trellis\Common\Options;
-use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
 use Workflux\StateMachine\StateMachineInterface;
+use Trellis\Common\Options;
+use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 
 class TeamType extends ProjectionType
 {
     public function __construct(StateMachineInterface $state_machine)
     {
-        parent::__construct('Team', $state_machine);
+        parent::__construct('Team', $state_machine, new Options([ 'is_hierarchical' => true ]));
     }
 
     public function getDefaultAttributes()
@@ -19,7 +19,7 @@ class TeamType extends ProjectionType
         return array_merge(
             parent::getDefaultAttributes(),
             [
-                new Text('name', $this, [ 'mandatory' => true ]),
+                new Text('name', $this, [ 'mandatory' => true ])
             ]
         );
     }

@@ -27,6 +27,7 @@ class ProfileType extends EntityType
                     [
                         'entity_types' => [
                             ProjectionType::NAMESPACE_PREFIX . 'Player\\Reference\\TeamType',
+                            ProjectionType::NAMESPACE_PREFIX . 'Player\\Reference\\ClanType'
                         ]
                     ],
                     $parent_attribute
@@ -36,13 +37,13 @@ class ProfileType extends EntityType
                     $this,
                     [
                         'entity_types' => [
-                            ProjectionType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType',
+                            ProjectionType::NAMESPACE_PREFIX . 'Player\\Embed\\BadgeType'
                         ]
                     ],
                     $parent_attribute
                 )
             ],
-            new Options([]),
+            new Options,
             $parent,
             $parent_attribute
         );

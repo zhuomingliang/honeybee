@@ -1,27 +1,28 @@
 <?php
 
-namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Reference;
+namespace Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Player\Reference;
 
-use Honeybee\Projection\ReferencedEntityType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\ProjectionType;
+use Honeybee\Model\Aggregate\ReferencedEntityType;
+use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\EntityType;
 use Trellis\Common\Options;
 use Trellis\Runtime\EntityTypeInterface;
 use Trellis\Runtime\Attribute\AttributeInterface;
 use Trellis\Runtime\Attribute\Text\TextAttribute as Text;
 
-class TeamType extends ReferencedEntityType
+class ClanType extends ReferencedEntityType
 {
     public function __construct(EntityTypeInterface $parent = null, AttributeInterface $parent_attribute = null)
     {
         parent::__construct(
-            'Team',
+            'Clan',
             [
-                new Text('name', $this, [ 'mirrored' => true ], $parent_attribute)
+                new Text('name', $this, [], $parent_attribute)
             ],
             new Options(
                 [
-                    'referenced_type' => ProjectionType::NAMESPACE_PREFIX . 'Team\\TeamType',
-                    'identifying_attribute' => 'identifier',
+                    'referenced_type' => EntityType::NAMESPACE_PREFIX . 'Team\\TeamType',
+                    'referenced_type_prefix' => 'team',
+                    'identifying_attribute' => 'identifier'
                 ]
             ),
             $parent,
@@ -31,6 +32,6 @@ class TeamType extends ReferencedEntityType
 
     public static function getEntityImplementor()
     {
-        return Team::CLASS;
+        return Clan::CLASS;
     }
 }

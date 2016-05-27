@@ -6,8 +6,4 @@ use Honeybee\Model\Aggregate\AggregateRoot;
 
 class Player extends AggregateRoot
 {
-    public function getName()
-    {
-        return $this->getValue('name');
-    }
 }

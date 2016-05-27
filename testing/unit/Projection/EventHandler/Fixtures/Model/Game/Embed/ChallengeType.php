@@ -17,7 +17,7 @@ class ChallengeType extends EmbeddedEntityType
             [
                 new IntegerAttribute('attempts', $this, [], $parent_attribute)
             ],
-            new Options([]),
+            new Options,
             $parent,
             $parent_attribute
         );
