@@ -10,12 +10,12 @@ use Honeybee\Projection\ProjectionInterface;
 use Honeybee\Projection\ProjectionUpdatedEvent;
 use Honeybee\Projection\EventHandler\ProjectionUpdater;
 use Honeybee\Infrastructure\Config\ArrayConfig;
-use Honeybee\Infrastructure\Event\Bus\EventBus;
-use Honeybee\Infrastructure\DataAccess\DataAccessService;
+use Honeybee\Infrastructure\Event\Bus\EventBusInterface;
 use Honeybee\Infrastructure\DataAccess\Finder\FinderInterface;
-use Honeybee\Infrastructure\DataAccess\Finder\FinderResult;
+use Honeybee\Infrastructure\DataAccess\Finder\FinderResultInterface;
 use Honeybee\Infrastructure\DataAccess\Storage\Elasticsearch\Projection\ProjectionWriter;
 use Honeybee\Infrastructure\DataAccess\Storage\Elasticsearch\Projection\ProjectionReader;
+use Honeybee\Infrastructure\DataAccess\DataAccessServiceInterface;
 use Honeybee\Infrastructure\DataAccess\Query\QueryInterface;
 use Honeybee\Infrastructure\DataAccess\Query\QueryServiceMap;
 use Honeybee\Infrastructure\DataAccess\Query\QueryServiceInterface;
@@ -60,137 +60,33 @@ class ProjectionUpdaterTest extends TestCase
     }
 
     /**
-     * @dataProvider provideTestEvents
+     * @dataProvider provideTestCreatedEvents
      */
-    public function testHandleEvents(
-        array $event,
-        array $aggregate_root,
-        array $parent_node,
-        array $query,
-        array $projections,
-        array $expectations
-    ) {
-        $mock_finder_result = M::mock(FinderResult::CLASS);
+    public function testHandleEventsCreatedEvent(array $event_state, array $projections, array $expectations)
+    {
+        $mock_finder_result = M::mock(FinderResultInterface::CLASS);
+        $this->addProjectionsToMockFinderResult($mock_finder_result, $projections);
 
-        //different handling when using a query
-        if (empty($query)) {
-            $mock_finder_result->shouldReceive('hasResults')->times(count($projections))->andReturn(true);
-            foreach ($projections as $reference_state) {
-                $projection = $this->projection_type_map
-                    ->getByEntityImplementor($reference_state['@type'])
-                    ->createEntity($reference_state);
-                $mock_finder_result->shouldReceive('getFirstResult')->once()->andReturn($projection);
-            }
-        }
-
-        // build mock finder responses
         $mock_finder = M::mock(FinderInterface::CLASS);
-        foreach ($event['embedded_entity_events'] as $embedded_entity_event) {
-            if (isset($embedded_entity_event['data']['referenced_identifier'])
-                && strpos($embedded_entity_event['@type'], 'Removed') === false
-            ) {
-                $mock_finder->shouldReceive('getByIdentifier')
-                    ->once()
-                    ->with($embedded_entity_event['data']['referenced_identifier'])
-                    ->andReturn($mock_finder_result);
-            }
-        }
+        $this->addEmdeddedEventsToMockFinder(
+            $mock_finder,
+            $event_state['embedded_entity_events'],
+            $mock_finder_result
+        );
 
-        // prepare storage writer expectations
         $mock_storage_writer = M::mock(ProjectionWriter::CLASS);
-        foreach ($expectations as $expectation) {
-            $mock_storage_writer->shouldReceive('write')
-                ->once()
-                ->with(M::on(
-                    function (ProjectionInterface $projection) use ($expectation) {
-                        $this->assertEquals($expectation, $projection->toArray());
-                        return true;
-                    }
-                ));
-        }
+        $this->addExpectationsToStorageWriter($mock_storage_writer, $expectations);
 
-        $mock_event_bus = M::mock(EventBus::CLASS);
-        foreach ($expectations as $expectation) {
-            $mock_event_bus->shouldReceive('distribute')
-                ->once()
-                ->with('honeybee.events.infrastructure', M::on(
-                    function (ProjectionUpdatedEvent $update_event) use ($expectation) {
-                        $this->assertEquals($expectation['identifier'], $update_event->getProjectionIdentifier());
-                        $this->assertEquals($expectation['@type'] . 'Type', $update_event->getProjectionType());
-                        $this->assertEquals($expectation, $update_event->getData());
-                        return true;
-                    }
-                ))
-                ->andReturnNull();
-        }
+        $mock_event_bus = M::mock(EventBusInterface::CLASS);
+        $this->addExpectationsToEventBus($mock_event_bus, $expectations);
 
-        $mock_data_access_service = M::mock(DataAccessService::CLASS);
-        $mock_data_access_service->shouldReceive('getStorageWriter')
-            ->times(count($expectations))
-            ->andReturn($mock_storage_writer);
+        $mock_data_access_service = M::mock(DataAccessServiceInterface::CLASS);
+        $mock_data_access_service->shouldReceive('getStorageWriter')->once()->andReturn($mock_storage_writer);
+        $mock_data_access_service->shouldReceive('getFinder')->times(count($projections))->andReturn($mock_finder);
 
-        // Set up expectations for aggregate root modification events
-        $mock_storage_reader = M::mock(ProjectionReader::CLASS);
-        if (!empty($aggregate_root)) {
-            $aggregate_root = $this->projection_type_map
-                ->getByEntityImplementor($aggregate_root['@type'])
-                ->createEntity($aggregate_root);
-            $mock_storage_reader->shouldReceive('read')
-                ->once()
-                ->with($aggregate_root->getIdentifier())
-                ->andReturn($aggregate_root);
-            $mock_data_access_service->shouldReceive('getStorageReader')
-                ->once()
-                ->with($aggregate_root->getType()->getPrefix() . '::projection.standard::view_store::reader')
-                ->andReturn($mock_storage_reader);
-        }
-
-        // Setup expectations for node moved events
-        if (!empty($parent_node)) {
-            $parent_node = $this->projection_type_map
-                ->getByEntityImplementor($parent_node['@type'])
-                ->createEntity($parent_node);
-            $mock_storage_reader->shouldReceive('read')
-                ->once()
-                ->with($parent_node->getIdentifier())
-                ->andReturn($parent_node);
-            $mock_data_access_service->shouldReceive('getStorageReader')
-                ->once()
-                ->with($parent_node->getType()->getPrefix() . '::projection.standard::view_store::reader')
-                ->andReturn($mock_storage_reader);
-        }
-
-        // build projection finder results
         $mock_query_service_map = M::mock(QueryServiceMap::CLASS);
-        if (!empty($query)) {
-            foreach ($projections as $projection) {
-                $projection_type = $this->projection_type_map->getByEntityImplementor($projection['@type']);
-                $projection_type_prefix = $projection_type->getPrefix();
-                $related_projections[] = $projection_type->createEntity($projection);
-            }
-            $mock_query_service = M::mock(QueryServiceInterface::CLASS);
-            $mock_finder_result->shouldReceive('getResults')->once()->withNoArgs()->andReturn($related_projections);
-            $mock_query_service_map->shouldReceive('getItem')
-                ->once()
-                ->with($projection_type_prefix . '::query_service')
-                ->andReturn($mock_query_service);
-            $mock_query_service->shouldReceive('find')
-                ->once()
-                ->with(M::on(
-                    function (QueryInterface $search_query) use ($query) {
-                        $this->assertEquals($query, $search_query->toArray());
-                        return true;
-                    }
-                ))
-                ->andReturn($mock_finder_result);
-        } else {
-            $mock_data_access_service->shouldReceive('getFinder')
-                ->times(count($projections))
-                ->andReturn($mock_finder);
-            $mock_query_service_map->shouldNotReceive('getItem');
-        }
 
-        // prepare and test subject
+        // prepare and execute tests
         $projection_updater = new ProjectionUpdater(
             new ArrayConfig([]),
             new NullLogger,
@@ -201,16 +97,233 @@ class ProjectionUpdaterTest extends TestCase
             $mock_event_bus
         );
 
-        $event = $this->buildEvent($event);
+        $event = $this->buildEvent($event_state);
         $projection_updater->handleEvent($event);
+    }
+
+    /**
+     * @dataProvider provideTestModifiedEvents
+     */
+    public function testHandleEventsModifiedEvent(
+        array $event_state,
+        array $subject,
+        array $projections,
+        array $expectations
+    ) {
+        $mock_finder_result = M::mock(FinderResultInterface::CLASS);
+        $this->addProjectionsToMockFinderResult($mock_finder_result, $projections);
+
+        $mock_finder = M::mock(FinderInterface::CLASS);
+        $this->addEmdeddedEventsToMockFinder(
+            $mock_finder,
+            $event_state['embedded_entity_events'],
+            $mock_finder_result
+        );
+
+        $mock_storage_writer = M::mock(ProjectionWriter::CLASS);
+        $this->addExpectationsToStorageWriter($mock_storage_writer, $expectations);
+
+        $mock_event_bus = M::mock(EventBusInterface::CLASS);
+        $this->addExpectationsToEventBus($mock_event_bus, $expectations);
+
+        $mock_data_access_service = M::mock(DataAccessServiceInterface::CLASS);
+        $mock_data_access_service->shouldReceive('getStorageWriter')->once()->andReturn($mock_storage_writer);
+        $mock_data_access_service->shouldReceive('getFinder')->times(count($projections))->andReturn($mock_finder);
+
+        // expectations for loading subject
+        $subject = $this->createProjection($subject);
+        $mock_storage_reader = M::mock(ProjectionReader::CLASS);
+        $mock_storage_reader->shouldReceive('read')->once()->with($subject->getIdentifier())->andReturn($subject);
+        $mock_data_access_service->shouldReceive('getStorageReader')
+            ->once()
+            ->with($subject->getType()->getPrefix() . '::projection.standard::view_store::reader')
+            ->andReturn($mock_storage_reader);
+
+        $mock_query_service_map = M::mock(QueryServiceMap::CLASS);
+
+        // prepare and execute tests
+        $projection_updater = new ProjectionUpdater(
+            new ArrayConfig([]),
+            new NullLogger,
+            $mock_data_access_service,
+            $mock_query_service_map,
+            $this->projection_type_map,
+            $this->aggregate_root_type_map,
+            $mock_event_bus
+        );
+
+        $event = $this->buildEvent($event_state);
+        $projection_updater->handleEvent($event);
+    }
+
+    /**
+     * @dataProvider provideTestNodeMovedEvents
+     */
+    public function testHandleEventsNodeMovedEvent(
+        array $event_state,
+        array $subject,
+        array $parent,
+        array $query,
+        array $projections,
+        array $expectations
+    ) {
+        $mock_finder_result = M::mock(FinderResultInterface::CLASS);
+        foreach ($projections as $projection) {
+            $related_projections[] = $this->createProjection($projection);
+        }
+        $mock_finder_result->shouldReceive('getResults')->once()->andReturn($related_projections);
+
+        // query execution expectations for moved nodes
+        $mock_query_service_map = M::mock(QueryServiceMap::CLASS);
+        $mock_query_service = M::mock(QueryServiceInterface::CLASS);
+        $mock_query_service_map->shouldReceive('getItem')
+            ->once()
+            ->with('honeybee-cmf.projection_fixtures.team::query_service')
+            ->andReturn($mock_query_service);
+        $mock_query_service->shouldReceive('find')
+            ->once()
+            ->with(M::on(
+                function (QueryInterface $search_query) use ($query) {
+                    $this->assertEquals($query, $search_query->toArray());
+                    return true;
+                }
+            ))
+            ->andReturn($mock_finder_result);
+
+        $mock_finder = M::mock(FinderInterface::CLASS);
+        $this->addEmdeddedEventsToMockFinder(
+            $mock_finder,
+            $event_state['embedded_entity_events'],
+            $mock_finder_result
+        );
+
+        $mock_storage_writer = M::mock(ProjectionWriter::CLASS);
+        $this->addExpectationsToStorageWriter($mock_storage_writer, $expectations);
+
+        $mock_event_bus = M::mock(EventBusInterface::CLASS);
+        $this->addExpectationsToEventBus($mock_event_bus, $expectations);
+
+        $mock_data_access_service = M::mock(DataAccessServiceInterface::CLASS);
+        $mock_data_access_service->shouldReceive('getStorageWriter')->once()->andReturn($mock_storage_writer);
+
+        // expectations for loading subject
+        $subject = $this->createProjection($subject);
+        $mock_storage_reader = M::mock(ProjectionReader::CLASS);
+        $mock_storage_reader->shouldReceive('read')->once()->with($subject->getIdentifier())->andReturn($subject);
+        $mock_data_access_service->shouldReceive('getStorageReader')
+            ->once()
+            ->with($subject->getType()->getPrefix() . '::projection.standard::view_store::reader')
+            ->andReturn($mock_storage_reader);
+
+        // expectation for loading parent when necessary
+        if (!empty($parent)) {
+            $parent = $this->createProjection($parent);
+            $mock_storage_reader->shouldReceive('read')
+                ->once()
+                ->with($parent->getIdentifier())
+                ->andReturn($parent);
+            $mock_data_access_service->shouldReceive('getStorageReader')
+                ->once()
+                ->with($parent->getType()->getPrefix() . '::projection.standard::view_store::reader')
+                ->andReturn($mock_storage_reader);
+        }
+
+        // prepare and execute tests
+        $projection_updater = new ProjectionUpdater(
+            new ArrayConfig([]),
+            new NullLogger,
+            $mock_data_access_service,
+            $mock_query_service_map,
+            $this->projection_type_map,
+            $this->aggregate_root_type_map,
+            $mock_event_bus
+        );
+
+        $event = $this->buildEvent($event_state);
+        $projection_updater->handleEvent($event);
+    }
+
+    // ------------------------ expectation helpers ------------------------
+
+    protected function addProjectionsToMockFinderResult(FinderResultInterface $mock_finder_result, array $projections)
+    {
+        $mock_finder_result->shouldReceive('hasResults')->times(count($projections))->andReturn(true);
+        foreach ($projections as $projection_state) {
+            $projection = $this->createProjection($projection_state);
+            $mock_finder_result->shouldReceive('getFirstResult')->once()->andReturn($projection);
+        }
+    }
+
+    protected function addEmdeddedEventsToMockFinder(
+        FinderInterface $mock_finder,
+        array $embedded_events,
+        FinderResultInterface $mock_finder_result
+    ) {
+        foreach ($embedded_events as $embedded_entity_event) {
+            if (isset($embedded_entity_event['data']['referenced_identifier'])
+                && strpos($embedded_entity_event['@type'], 'Removed') === false
+            ) {
+                $mock_finder->shouldReceive('getByIdentifier')
+                    ->once()
+                    ->with($embedded_entity_event['data']['referenced_identifier'])
+                    ->andReturn($mock_finder_result);
+            }
+        }
+        return $mock_finder;
+    }
+
+    protected function addExpectationsToStorageWriter(ProjectionWriter $mock_storage_writer, array $expectations)
+    {
+        foreach ($expectations as $expectation) {
+            $mock_storage_writer->shouldReceive('write')
+            ->once()
+            ->with(M::on(
+                function (ProjectionInterface $projection) use ($expectation) {
+                    $this->assertEquals($expectation, $projection->toArray());
+                    return true;
+                }
+            ));
+        }
+    }
+
+    protected function addExpectationsToEventBus(EventBusInterface $mock_event_bus, array $expectations)
+    {
+        foreach ($expectations as $expectation) {
+            $mock_event_bus->shouldReceive('distribute')
+                ->once()
+                ->with('honeybee.events.infrastructure', M::on(
+                    function (ProjectionUpdatedEvent $event) use ($expectation) {
+                        $this->assertEquals($expectation['identifier'], $event->getProjectionIdentifier());
+                        $this->assertEquals($expectation['@type'] . 'Type', $event->getProjectionType());
+                        $this->assertEquals($expectation, $event->getData());
+                        return true;
+                    }
+                ))
+                ->andReturnNull();
+        }
     }
 
     // ------------------------------ helpers ------------------------------
 
-    public function provideTestEvents()
+    public function provideTestCreatedEvents()
+    {
+        return $this->loadFixtures('projection_created_test*.php');
+    }
+
+    public function provideTestModifiedEvents()
+    {
+        return $this->loadFixtures('projection_modified_test*.php');
+    }
+
+    public function provideTestNodeMovedEvents()
+    {
+        return $this->loadFixtures('projection_nodemoved_test*.php');
+    }
+
+    protected function loadFixtures($pattern)
     {
         $tests = [];
-        foreach (glob(__DIR__ . '/Fixtures/data/projection_updater*.php') as $filename) {
+        foreach (glob(__DIR__ . '/Fixtures/data/' . $pattern) as $filename) {
             $tests[] = include $filename;
         }
         return $tests;
@@ -225,6 +338,11 @@ class ProjectionUpdaterTest extends TestCase
         }
         $event_state['embedded_entity_events'] = $embedded_entity_events;
         return new $event_type_class($event_state);
+    }
+
+    protected function createProjection(array $state)
+    {
+        return $this->projection_type_map->getByEntityImplementor($state['@type'])->createEntity($state);
     }
 
     protected function getDefaultStateMachine()

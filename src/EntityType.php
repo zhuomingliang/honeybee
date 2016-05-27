@@ -93,6 +93,10 @@ abstract class EntityType extends BaseEntityType implements EntityTypeInterface,
 
     /**
      * Recursively mirror values from the provided entity
+     * @param EntityInterface $source_entity
+     * @param EntityInterface $target_entity
+     *
+     * @return EntityInterface
      */
     public function createMirroredEntity(EntityInterface $source_entity, EntityInterface $target_entity = null)
     {

@@ -4,7 +4,7 @@
  *  Aggregate root node moved test
  */
 return [
-    'event' => [
+    'event_state' => [
         '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Task\TeamNodeMovedEvent',
         'data' => [
             'parent_node_id' => 'honeybee.fixtures.team-d74d3f93-ceba-4782-95ae-92458b4df34c-de_DE-1'
@@ -17,7 +17,7 @@ return [
         'iso_date' => '2016-04-28T10:54:37.371793+00:00',
         'metadata' => []
     ],
-    'aggregate_root' => [
+    'subject' => [
         '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Team\Team',
         'identifier' => 'honeybee.fixtures.team-d8668418-719e-4c09-886c-c49f45d3ee97-de_DE-1',
         'revision' => 3,
@@ -34,7 +34,7 @@ return [
         'materialized_path' => '',
         'name' => 'Modifying Team'
     ],
-    'parent_node' => [
+    'parent' => [
         '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Team\Team',
         'identifier' => 'honeybee.fixtures.team-d74d3f93-ceba-4782-95ae-92458b4df34c-de_DE-1',
         'revision' => 9,

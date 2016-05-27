@@ -72,9 +72,10 @@ class ProjectionUpdater extends EventHandler
         $updated_projections = $this->invokeEventHandler($event, 'on');
 
         // store updates and distribute projection update events
+        $storage_writer = $this->getStorageWriter($event);
         foreach ($updated_projections as $updated_projection) {
             // @todo introduce a writeMany method to the storageWriter to save requests
-            $this->getStorageWriter($event)->write($updated_projection);
+            $storage_writer->write($updated_projection);
             $update_event = new ProjectionUpdatedEvent(
                 [
                     'uuid' => Uuid::uuid4()->toString(),

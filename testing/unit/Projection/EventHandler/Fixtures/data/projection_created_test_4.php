@@ -4,7 +4,7 @@
  *  Test cases are described by related flow chart images
  */
 return [
-    'event' => [
+    'event_state' => [
         '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Task\GameCreatedEvent',
         'data' => [
             'identifier' => 'honeybee.fixtures.game-49c5a3b7-8127-4169-8676-a9ebb5229142-de_DE-1',
@@ -48,9 +48,6 @@ return [
         'iso_date' => '2016-04-28T10:52:37.371793+00:00',
         'metadata' => []
     ],
-    'aggregate_root' => [],
-    'parent_node' => [],
-    'query' => [],
     'projections' => [
         [
             '@type' => 'Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\Player',
