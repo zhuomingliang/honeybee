@@ -16,10 +16,10 @@ use Honeybee\Infrastructure\DataAccess\Storage\StorageWriterMap;
 use Honeybee\Infrastructure\DataAccess\Storage\Elasticsearch\Projection\ProjectionWriter;
 use Honeybee\Infrastructure\DataAccess\Query\QueryServiceInterface;
 use Honeybee\Infrastructure\Event\Bus\EventBus;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\GameType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\PlayerType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Team\TeamType;
-use Workflux\Builder\XmlStateMachineBuilder;
+use Honeybee\Tests\Fixtures\GameSchema\Projection\Game\GameType;
+use Honeybee\Tests\Fixtures\GameSchema\Projection\Player\PlayerType;
+use Honeybee\Tests\Fixtures\GameSchema\Projection\Team\TeamType;
+use Workflux\StateMachine\StateMachineInterface;
 use Psr\Log\NullLogger;
 use Mockery as M;
 
@@ -31,7 +31,7 @@ class RelationProjectionUpdaterTest extends TestCase
 
     public function setUp()
     {
-        $state_machine = $this->getDefaultStateMachine();
+        $state_machine =  M::mock(StateMachineInterface::CLASS);
 
         $game_type = new GameType($state_machine);
         $player_type = new PlayerType($state_machine);
@@ -130,10 +130,13 @@ class RelationProjectionUpdaterTest extends TestCase
 
     // ------------------------------ helpers ------------------------------
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function provideTestEvents()
     {
         $tests = [];
-        foreach (glob(__DIR__ . '/Fixtures/data/relation_projection_updater*.php') as $filename) {
+        foreach (glob(__DIR__ . '/data/relation_projection_updater*.php') as $filename) {
             $tests[] = include $filename;
         }
         return $tests;
@@ -143,18 +146,5 @@ class RelationProjectionUpdaterTest extends TestCase
     {
         $event_type_class = $event_state['@type'];
         return new $event_type_class($event_state);
-    }
-
-    protected function getDefaultStateMachine()
-    {
-        $workflows_file_path = __DIR__ . '/Fixtures/Model/workflows.xml';
-        $workflow_builder = new XmlStateMachineBuilder(
-            [
-                'name' => 'game_workflow_default',
-                'state_machine_definition' => $workflows_file_path
-            ]
-        );
-
-        return $workflow_builder->build();
     }
 }

@@ -71,6 +71,7 @@ class ProjectionUpdater extends EventHandler
     {
         $updated_projections = $this->invokeEventHandler($event, 'on');
 
+        // @todo diff check
         // store updates and distribute projection update events
         $storage_writer = $this->getStorageWriter($event);
         foreach ($updated_projections as $updated_projection) {

@@ -19,12 +19,12 @@ use Honeybee\Infrastructure\DataAccess\DataAccessServiceInterface;
 use Honeybee\Infrastructure\DataAccess\Query\QueryInterface;
 use Honeybee\Infrastructure\DataAccess\Query\QueryServiceMap;
 use Honeybee\Infrastructure\DataAccess\Query\QueryServiceInterface;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Game\GameType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Model\Team\TeamType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Game\GameType as GameProjectionType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Player\PlayerType as PlayerProjectionType;
-use Honeybee\Tests\Projection\EventHandler\Fixtures\Projection\Team\TeamType as TeamProjectionType;
-use Workflux\Builder\XmlStateMachineBuilder;
+use Honeybee\Tests\Fixtures\GameSchema\Model\Game\GameType;
+use Honeybee\Tests\Fixtures\GameSchema\Model\Team\TeamType;
+use Honeybee\Tests\Fixtures\GameSchema\Projection\Game\GameType as GameProjectionType;
+use Honeybee\Tests\Fixtures\GameSchema\Projection\Player\PlayerType as PlayerProjectionType;
+use Honeybee\Tests\Fixtures\GameSchema\Projection\Team\TeamType as TeamProjectionType;
+use Workflux\StateMachine\StateMachineInterface;
 use Psr\Log\NullLogger;
 use Mockery as M;
 
@@ -36,7 +36,7 @@ class ProjectionUpdaterTest extends TestCase
 
     public function setUp()
     {
-        $state_machine = $this->getDefaultStateMachine();
+        $state_machine =  M::mock(StateMachineInterface::CLASS);
 
         $game_aggregate_root_type = new GameType($state_machine);
         $team_aggregate_root_type = new TeamType($state_machine);
@@ -178,7 +178,7 @@ class ProjectionUpdaterTest extends TestCase
         $mock_query_service = M::mock(QueryServiceInterface::CLASS);
         $mock_query_service_map->shouldReceive('getItem')
             ->once()
-            ->with('honeybee-cmf.projection_fixtures.team::query_service')
+            ->with('honeybee-tests.game_schema.team::query_service')
             ->andReturn($mock_query_service);
         $mock_query_service->shouldReceive('find')
             ->once()
@@ -305,25 +305,37 @@ class ProjectionUpdaterTest extends TestCase
 
     // ------------------------------ helpers ------------------------------
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function provideTestCreatedEvents()
     {
         return $this->loadFixtures('projection_created_test*.php');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function provideTestModifiedEvents()
     {
         return $this->loadFixtures('projection_modified_test*.php');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function provideTestNodeMovedEvents()
     {
         return $this->loadFixtures('projection_nodemoved_test*.php');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function loadFixtures($pattern)
     {
         $tests = [];
-        foreach (glob(__DIR__ . '/Fixtures/data/' . $pattern) as $filename) {
+        foreach (glob(__DIR__ . '/data/' . $pattern) as $filename) {
             $tests[] = include $filename;
         }
         return $tests;
@@ -343,18 +355,5 @@ class ProjectionUpdaterTest extends TestCase
     protected function createProjection(array $state)
     {
         return $this->projection_type_map->getByEntityImplementor($state['@type'])->createEntity($state);
-    }
-
-    protected function getDefaultStateMachine()
-    {
-        $workflows_file_path = __DIR__ . '/Fixtures/Model/workflows.xml';
-        $workflow_builder = new XmlStateMachineBuilder(
-            [
-                'name' => 'game_workflow_default',
-                'state_machine_definition' => $workflows_file_path
-            ]
-        );
-
-        return $workflow_builder->build();
     }
 }
