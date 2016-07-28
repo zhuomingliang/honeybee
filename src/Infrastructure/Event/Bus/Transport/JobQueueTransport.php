@@ -9,19 +9,16 @@ use Honeybee\Infrastructure\Job\JobServiceInterface;
 
 class JobQueueTransport extends EventTransport
 {
-    const DEFAULT_EVENT_EXCHANGE = 'honeybee.domain.events';
-
     protected $job_service;
 
-    protected $exchange_name;
+    protected $exchange;
 
-    public function __construct($name, JobServiceInterface $job_service, $exchange = null)
+    public function __construct($name, JobServiceInterface $job_service, $exchange)
     {
         parent::__construct($name);
 
-        $this->exchange_name = $exchange ?: self::DEFAULT_EVENT_EXCHANGE;
+        $this->exchange = $exchange;
         $this->job_service = $job_service;
-        $this->job_service->initialize($this->exchange_name);
     }
 
     public function send($channel_name, EventInterface $event, $subscription_index, SettingsInterface $settings = null)
@@ -37,6 +34,6 @@ class JobQueueTransport extends EventTransport
             $settings->get('job')
         );
 
-        $this->job_service->dispatch($job, $this->exchange_name);
+        $this->job_service->dispatch($job, $this->exchange);
     }
 }
